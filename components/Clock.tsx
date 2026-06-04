@@ -18,9 +18,11 @@ const Clock = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-4xl font-extrabold lg:text-7xl">{time}</h1>
-      <p className="text-lg font-medium text-sky-1 lg:text-2xl">{date}</p>
+      <h1 className="text-4xl font-extrabold lg:text-6xl tracking-tighter leading-none">{time}</h1>
+      <p className="text-lg font-semibold text-sky-1 lg:text-2xl tracking-tight opacity-90">{date}</p>
     </div>
+
+
   );
 };
 
