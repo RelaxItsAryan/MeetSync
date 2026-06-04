@@ -50,6 +50,17 @@ const PersonalRoom = () => {
       });
     }
 
+    try {
+      const { saveMeetingToFirestore } = await import('@/actions/meeting.actions');
+      await saveMeetingToFirestore({
+        streamId: meetingId!,
+        description: `${user?.username}'s Personal Meeting`,
+        startsAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Failed to save personal meeting to Firestore:', error);
+    }
+
     router.push(`/meeting/${meetingId}?personal=true`);
   };
 

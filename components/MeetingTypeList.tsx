@@ -169,7 +169,18 @@ const MeetingTypeList = () => {
         title="Type the link here"
         className="text-center"
         buttonText="Join Meeting"
-        handleClick={() => router.push(values.link)}
+        handleClick={async () => {
+          try {
+            await saveMeetingToFirestore({
+              streamId: values.link.split('/').pop() || values.link,
+              description: "Joined Meeting",
+              startsAt: new Date().toISOString(),
+            });
+          } catch (e) {
+            console.error("Failed to log joined meeting:", e);
+          }
+          router.push(values.link);
+        }}
       >
         <Input
           placeholder="Meeting link"
