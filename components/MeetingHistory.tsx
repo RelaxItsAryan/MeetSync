@@ -34,7 +34,8 @@ const MeetingHistory = () => {
             link={`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.streamId}`}
             buttonIcon1={undefined}
             buttonText="Start"
-            handleClick={() => window.location.href = `/meeting/${meeting.streamId}`}
+            handleClick={() => { window.location.href = `/meeting/${meeting.streamId}`; }}
+
           />
         ))
       ) : (

@@ -110,7 +110,8 @@ const CalendarPage = () => {
                   isPreviousMeeting={new Date(meeting.state.startsAt!) < new Date()}
                   link={`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.id}`}
                   buttonText="Start"
-                  handleClick={() => window.open(`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.id}`)}
+                  handleClick={() => { window.open(`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.id}`); }}
+
                 />
               ))
             ) : (

@@ -58,9 +58,10 @@ const MeetingTypeList = () => {
       try {
         await saveMeetingToFirestore({
           streamId: call.id,
-          description: description,
-          startsAt: startsAt,
+          description,
+          startsAt,
         });
+
       } catch (dbError) {
         console.error('Failed to save to Firebase:', dbError);
         // We don't block the user if DB fails, as the meeting is already in Stream
