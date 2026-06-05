@@ -52,15 +52,13 @@ const Navbar = () => {
               <div className="flex items-center gap-3">
                 <div className="size-9 rounded-full overflow-hidden border-2 border-blue-1 hover:border-blue-400 transition cursor-pointer shadow-lg">
                   {user.photoURL ? (
-                    <img
+                    <Image
                       src={user.photoURL}
                       width={36}
                       height={36}
                       alt={user.displayName || 'User'}
                       className="rounded-full object-cover size-full"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=0E78F9&color=fff`;
-                      }}
+                      unoptimized
                     />
                   ) : (
                     <div className="flex size-full items-center justify-center bg-blue-1 text-white font-bold text-sm">

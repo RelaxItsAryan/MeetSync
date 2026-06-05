@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy } from "firebase/firestore";
 import { cookies } from "next/headers";
 
 const getUserIdFromCookie = (): string => {
@@ -9,8 +9,11 @@ const getUserIdFromCookie = (): string => {
   const tokenCookie = cookieStore.get('firebase-auth-token');
   if (!tokenCookie?.value) throw new Error('Unauthorized');
 
+  const parts = tokenCookie.value.split('.');
+  if (parts.length !== 3) throw new Error('Invalid token structure');
+
   const payload = JSON.parse(
-    Buffer.from(tokenCookie.value.split('.')[1], 'base64').toString('utf8')
+    Buffer.from(parts[1], 'base64url').toString('utf8')
   );
   const userId: string = payload.user_id || payload.sub;
   if (!userId) throw new Error('Could not extract user ID from token');
@@ -43,8 +46,6 @@ export const saveMeetingToFirestore = async (meetingData: {
 export const getMeetingsFromFirestore = async () => {
   try {
     const userId = getUserIdFromCookie();
-
-    const { getDocs, query, collection, where, orderBy } = await import("firebase/firestore");
 
     const q = query(
       collection(db, "meetings"),

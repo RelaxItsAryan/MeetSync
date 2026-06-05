@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
 import HomeCard from './HomeCard';
@@ -10,10 +11,14 @@ import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { useFirebaseUser } from '@/providers/FirebaseAuthProvider';
 import Loader from './Loader';
 import { Textarea } from './ui/textarea';
-import ReactDatePicker from 'react-datepicker';
 import { useToast } from './ui/use-toast';
 import { Input } from './ui/input';
 import { saveMeetingToFirestore } from '@/actions/meeting.actions';
+
+const ReactDatePicker = dynamic(() => import('react-datepicker'), {
+  ssr: false,
+  loading: () => <Loader />,
+});
 
 const initialValues = {
   dateTime: new Date(),
@@ -156,7 +161,7 @@ const MeetingTypeList = () => {
             </label>
             <ReactDatePicker
               selected={values.dateTime}
-              onChange={(date) => setValues({ ...values, dateTime: date! })}
+              onChange={(date) => setValues({ ...values, dateTime: date as Date })}
               showTimeSelect
               timeFormat="HH:mm"
               timeIntervals={15}

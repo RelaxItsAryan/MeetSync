@@ -5,6 +5,7 @@ import { useFirebaseUser } from '@/providers/FirebaseAuthProvider';
 import { updateProfile } from 'firebase/auth';
 import { useToast } from '@/components/ui/use-toast';
 import Loader from '@/components/Loader';
+import Image from 'next/image';
 
 const ProfilePage = () => {
   const { user } = useFirebaseUser();
@@ -40,13 +41,13 @@ const ProfilePage = () => {
         <div className="flex flex-col items-center gap-4">
           <div className="relative size-32 rounded-full overflow-hidden border-4 border-blue-1 ring-4 ring-blue-1/20 shadow-2xl">
             {user.photoURL ? (
-              <img 
+              <Image 
                 src={user.photoURL} 
                 alt="Avatar" 
+                width={128}
+                height={128}
                 className="size-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=0E78F9&color=fff&size=128`;
-                }}
+                unoptimized
               />
             ) : (
               <div className="flex size-full items-center justify-center bg-blue-1 text-4xl font-bold text-white">
