@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -22,7 +22,7 @@ export default function SignInPage() {
     document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
   };
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
+  const handleEmailSignIn = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -54,7 +54,7 @@ export default function SignInPage() {
 
   return (
     <main className="flex h-screen w-full items-center justify-center bg-dark-2">
-      <div className="w-full max-w-md rounded-2xl bg-dark-1 p-8 shadow-2xl border border-dark-3">
+      <div className="w-full max-w-md rounded-2xl border border-dark-3 bg-dark-1 p-8 shadow-2xl">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-2">
           <Image src="/icons/logo.svg" width={48} height={48} alt="MeetSync logo" />
@@ -64,7 +64,7 @@ export default function SignInPage() {
 
         {/* Error */}
         {error && (
-          <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400 border border-red-500/20">
+          <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {error}
           </div>
         )}
@@ -79,7 +79,7 @@ export default function SignInPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
-              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-1 transition"
+              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:ring-2 focus:ring-blue-1"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -90,7 +90,7 @@ export default function SignInPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
-              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-1 transition"
+              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:ring-2 focus:ring-blue-1"
             />
           </div>
           <button
@@ -113,7 +113,7 @@ export default function SignInPage() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="flex w-full items-center justify-center gap-3 rounded-lg border border-dark-3 bg-dark-3 py-3 text-white font-medium transition hover:bg-dark-4 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-3 rounded-lg border border-dark-3 bg-dark-3 py-3 font-medium text-white transition hover:bg-dark-4 disabled:opacity-60"
         >
           <Image src="/icons/google.svg" width={20} height={20} alt="Google" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
           Continue with Google

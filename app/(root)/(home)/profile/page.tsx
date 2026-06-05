@@ -1,13 +1,10 @@
 'use client';
 
+import { useState, useEffect, FormEvent } from 'react';
 import { useFirebaseUser } from '@/providers/FirebaseAuthProvider';
-import Image from 'next/image';
-import { useState } from 'react';
 import { updateProfile } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { useToast } from '@/components/ui/use-toast';
 import Loader from '@/components/Loader';
-import React from 'react';
 
 const ProfilePage = () => {
   const { user } = useFirebaseUser();
@@ -15,13 +12,13 @@ const ProfilePage = () => {
   const [name, setName] = useState(user?.displayName || '');
   const [loading, setLoading] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user?.displayName) setName(user.displayName);
   }, [user]);
 
   if (!user) return <Loader />;
 
-  const handleUpdate = async (e: React.FormEvent) => {
+  const handleUpdate = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -69,7 +66,7 @@ const ProfilePage = () => {
                 type="text" 
                 value={name} 
                 onChange={(e) => setName(e.target.value)}
-                className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder-gray-500 outline-none border border-transparent focus:border-blue-1 transition-all"
+                className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder:text-gray-500 outline-none border border-transparent focus:border-blue-1 transition-all"
                 placeholder="Enter your name"
               />
             </div>

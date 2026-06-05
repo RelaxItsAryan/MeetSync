@@ -1,0 +1,104 @@
+
+> yoom@0.1.0 lint
+> next lint
+
+
+./app/(auth)/sign-in/[[...sigin-in]]/page.tsx
+3:26  Error: 'C:\Users\Aryan\OneDrive\Desktop\meeting prep\Meetsync\node_modules\react\index.js' imported multiple times.  import/no-duplicates
+12:19  Error: 'C:\Users\Aryan\OneDrive\Desktop\meeting prep\Meetsync\node_modules\react\index.js' imported multiple times.  import/no-duplicates
+58:12  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+68:16  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+83:15  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+83:15  Warning: Classname 'placeholder-gray-500' should be updated to 'placeholder:text-gray-500' in Tailwind CSS v3!  tailwindcss/migration-from-tailwind-2
+94:15  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+94:15  Warning: Classname 'placeholder-gray-500' should be updated to 'placeholder:text-gray-500' in Tailwind CSS v3!  tailwindcss/migration-from-tailwind-2
+117:11  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./app/(auth)/sign-up/[[...sign-up]]/page.tsx
+3:26  Error: 'C:\Users\Aryan\OneDrive\Desktop\meeting prep\Meetsync\node_modules\react\index.js' imported multiple times.  import/no-duplicates
+13:19  Error: 'C:\Users\Aryan\OneDrive\Desktop\meeting prep\Meetsync\node_modules\react\index.js' imported multiple times.  import/no-duplicates
+63:12  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+73:16  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+87:15  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+87:15  Warning: Classname 'placeholder-gray-500' should be updated to 'placeholder:text-gray-500' in Tailwind CSS v3!  tailwindcss/migration-from-tailwind-2
+98:15  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+98:15  Warning: Classname 'placeholder-gray-500' should be updated to 'placeholder:text-gray-500' in Tailwind CSS v3!  tailwindcss/migration-from-tailwind-2
+110:15  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+110:15  Warning: Classname 'placeholder-gray-500' should be updated to 'placeholder:text-gray-500' in Tailwind CSS v3!  tailwindcss/migration-from-tailwind-2
+133:11  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./app/(root)/(home)/calendar/page.tsx
+46:9  Warning: Expected property shorthand.  object-shorthand
+74:12  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+78:11  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+85:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+85:14  Warning: Classname 'calendar-container' is not a Tailwind CSS class!  tailwindcss/no-custom-classname
+147:13  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./app/(root)/(home)/layout.tsx
+21:16  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+21:16  Warning: Classnames 'w-full, h-full' could be replaced by the 'size-full' shorthand!  tailwindcss/enforces-shorthand
+
+./app/(root)/(home)/page.tsx
+20:12  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./app/(root)/(home)/personal-room/page.tsx
+40:26  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./app/(root)/(home)/profile/page.tsx
+4:37  Error: 'C:\Users\Aryan\OneDrive\Desktop\meeting prep\Meetsync\node_modules\react\index.js' imported multiple times.  import/no-duplicates
+8:19  Error: 'C:\Users\Aryan\OneDrive\Desktop\meeting prep\Meetsync\node_modules\react\index.js' imported multiple times.  import/no-duplicates
+37:11  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+39:12  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+42:16  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+44:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+58:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+65:22  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+70:17  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+76:22  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+81:17  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+87:22  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+88:21  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+96:15  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+105:12  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+106:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+107:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+110:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+111:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+114:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+115:14  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./components/Clock.tsx
+24:11  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+25:10  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./components/Greeting.tsx
+8:30  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+13:9  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./components/Navbar.tsx
+33:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+47:16  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+52:22  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+54:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+59:23  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+65:26  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+72:34  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+76:22  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+./components/ui/toast.tsx
+27:23  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+27:23  Warning: Classname 'destructive' is not a Tailwind CSS class!  tailwindcss/no-custom-classname
+86:8  Warning: Classnames 'h-4, w-4' could be replaced by the 'size-4' shorthand!  tailwindcss/enforces-shorthand
+
+./components/ui/use-toast.ts
+70:7  Warning: Expected property shorthand.  object-shorthand
+168:5  Warning: Expected property shorthand.  object-shorthand
+
+./components/UpcomingMeetingTime.tsx
+20:10  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+21:12  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+21:12  Warning: Classname 'shadow-glow' is not a Tailwind CSS class!  tailwindcss/no-custom-classname
+22:13  Warning: Invalid Tailwind CSS classnames order  tailwindcss/classnames-order
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
