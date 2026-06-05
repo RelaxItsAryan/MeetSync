@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 
 import HomeCard from './HomeCard';
 import MeetingModal from './MeetingModal';
@@ -38,17 +39,22 @@ const MeetingTypeList = () => {
   const { toast } = useToast();
 
   const createMeeting = async () => {
-    if (!client || !user) return;
+    if (!client || !user) {
+      toast({ title: 'Service not ready', description: 'Please wait a moment and try again.' });
+      return;
+    }
     try {
       if (!values.dateTime) {
         toast({ title: 'Please select a date and time' });
         return;
       }
-      const id = crypto.randomUUID();
+      const id = uuidv4();
       const call = client.call('default', id);
       if (!call) throw new Error('Failed to create meeting');
       const startsAt =
-        values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+        meetingState === 'isInstantMeeting' 
+          ? new Date().toISOString() 
+          : values.dateTime.toISOString();
       const description = values.description || 'Instant Meeting';
       await call.getOrCreate({
         data: {
@@ -56,6 +62,7 @@ const MeetingTypeList = () => {
           settings_override: {
             recording: {
               mode: 'available',
+              quality: '720p',
             },
           },
           custom: {
@@ -80,9 +87,13 @@ const MeetingTypeList = () => {
         router.push(`/meeting/${call.id}`);
       }
       toast({ title: 'Meeting Created' });
-    } catch (error) {
-      console.error(error);
-      toast({ title: 'Failed to create Meeting' });
+    } catch (error: any) {
+      console.error('Meeting creation error:', error);
+      toast({ 
+        title: 'Failed to create Meeting', 
+        description: error.message || 'Please check your connection and try again.',
+        variant: 'destructive'
+      });
     }
   };
 

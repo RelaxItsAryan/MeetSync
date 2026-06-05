@@ -24,8 +24,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(
-      Buffer.from(parts[1], 'base64url').toString('utf8')
+      Buffer.from(base64, 'base64').toString('utf8')
     );
     const userId: string = payload.user_id || payload.sub;
 
