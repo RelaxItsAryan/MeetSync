@@ -48,6 +48,11 @@ const MeetingTypeList = () => {
       await call.getOrCreate({
         data: {
           starts_at: startsAt,
+          settings_override: {
+            recording: {
+              mode: 'available',
+            },
+          },
           custom: {
             description,
           },

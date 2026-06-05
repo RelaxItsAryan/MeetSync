@@ -21,6 +21,7 @@ import {
 } from './ui/dropdown-menu';
 import Loader from './Loader';
 import EndCallButton from './EndCallButton';
+import CallRecordingButton from './CallRecordingButton';
 import { cn } from '@/lib/utils';
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
@@ -64,8 +65,9 @@ const MeetingRoom = () => {
         </div>
       </div>
       {/* video layout and call controls */}
-      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
+      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5 pb-4">
         <CallControls onLeave={() => router.push(`/`)} />
+        <CallRecordingButton />
 
         <DropdownMenu>
           <div className="flex items-center">

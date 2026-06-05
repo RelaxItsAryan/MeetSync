@@ -1,11 +1,11 @@
-import MeetingHistory from "@/components/MeetingHistory";
+import CallList from "@/components/CallList";
 
 const PreviousPage = () => {
   return (
     <section className="flex size-full flex-col gap-10 text-white">
-      <h1 className="text-3xl font-bold">Meeting History (Backend)</h1>
+      <h1 className="text-3xl font-bold">Meeting History</h1>
 
-      <MeetingHistory />
+      <CallList type="ended" />
     </section>
   );
 };

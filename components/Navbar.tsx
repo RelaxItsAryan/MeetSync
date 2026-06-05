@@ -79,14 +79,14 @@ const Navbar = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="cursor-pointer focus:bg-dark-3 focus:text-white"
                 onClick={() => router.push('/profile')}
               >
                 <User className="mr-2 size-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="cursor-pointer focus:bg-dark-3 focus:text-white"
                 onClick={() => router.push('/personal-room')}
               >
@@ -94,7 +94,7 @@ const Navbar = () => {
                 <span>Account Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="cursor-pointer text-red-500 focus:bg-red-500/10 focus:text-red-500"
                 onClick={handleSignOut}
               >
