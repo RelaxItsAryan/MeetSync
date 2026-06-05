@@ -10,7 +10,7 @@ import Loader from '@/components/Loader';
 import MeetingModal from '@/components/MeetingModal';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { useUser } from '@clerk/nextjs';
+import { useFirebaseUser } from '@/providers/FirebaseAuthProvider';
 import { saveMeetingToFirestore } from '@/actions/meeting.actions';
 
 const CalendarPage = () => {
@@ -20,7 +20,7 @@ const CalendarPage = () => {
   const [meetingTime, setMeetingTime] = useState(new Date());
   const { callRecordings: calls, isLoading } = useGetCalls();
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const client = useStreamVideoClient();
 
   const createMeeting = async () => {

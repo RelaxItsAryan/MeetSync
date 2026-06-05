@@ -30,6 +30,11 @@ export const sidebarLinks = [
     route: '/calendar',
     label: 'Calendar',
   },
+  {
+    imgURL: '/icons/user.svg',
+    route: '/profile',
+    label: 'Profile',
+  },
 ];
 
 export const avatarImages = [

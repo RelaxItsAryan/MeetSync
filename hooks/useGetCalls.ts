@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useFirebaseUser } from '@/providers/FirebaseAuthProvider';
 import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
 
 export const useGetCalls = () => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const client = useStreamVideoClient();
   const [calls, setCalls] = useState<Call[]>();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadCalls = async () => {
-      if (!client || !user?.id) return;
+      if (!client || !user?.uid) return;
       
       setIsLoading(true);
 
@@ -21,8 +21,8 @@ export const useGetCalls = () => {
           filter_conditions: {
             starts_at: { $exists: true },
             $or: [
-              { created_by_user_id: user.id },
-              { members: { $in: [user.id] } },
+              { created_by_user_id: user.uid },
+              { members: { $in: [user.uid] } },
             ],
           },
         });
@@ -36,7 +36,7 @@ export const useGetCalls = () => {
     };
 
     loadCalls();
-  }, [client, user?.id]);
+  }, [client, user?.uid]);
 
   const now = new Date();
 

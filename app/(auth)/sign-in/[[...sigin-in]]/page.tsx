@@ -1,9 +1,132 @@
-import { SignIn } from '@clerk/nextjs';
+'use client';
 
-export default function SiginInPage() {
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+
+export default function SignInPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const setAuthCookie = async (user: import('firebase/auth').User) => {
+    const token = await user.getIdToken();
+    document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
+  };
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await setAuthCookie(result.user);
+      router.push('/');
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      await setAuthCookie(result.user);
+      router.push('/');
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in with Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <main className="flex h-screen w-full items-center justify-center">
-      <SignIn />
+    <main className="flex h-screen w-full items-center justify-center bg-dark-2">
+      <div className="w-full max-w-md rounded-2xl bg-dark-1 p-8 shadow-2xl border border-dark-3">
+        {/* Logo */}
+        <div className="mb-8 flex flex-col items-center gap-2">
+          <Image src="/icons/logo.svg" width={48} height={48} alt="MeetSync logo" />
+          <h1 className="text-2xl font-extrabold text-white">Welcome back</h1>
+          <p className="text-sm text-sky-2">Sign in to MeetSync</p>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400 border border-red-500/20">
+            {error}
+          </div>
+        )}
+
+        {/* Email/Password Form */}
+        <form onSubmit={handleEmailSignIn} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-sky-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="you@example.com"
+              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-1 transition"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-sky-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-1 transition"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 rounded-lg bg-blue-1 py-3 font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+          >
+            {loading ? 'Signing in…' : 'Sign In'}
+          </button>
+        </form>
+
+        {/* Divider */}
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-dark-3" />
+          <span className="text-sm text-sky-2">or</span>
+          <div className="h-px flex-1 bg-dark-3" />
+        </div>
+
+        {/* Google Sign-In */}
+        <button
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="flex w-full items-center justify-center gap-3 rounded-lg border border-dark-3 bg-dark-3 py-3 text-white font-medium transition hover:bg-dark-4 disabled:opacity-60"
+        >
+          <Image src="/icons/google.svg" width={20} height={20} alt="Google" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          Continue with Google
+        </button>
+
+        {/* Sign Up link */}
+        <p className="mt-6 text-center text-sm text-sky-2">
+          Don&apos;t have an account?{' '}
+          <a href="/sign-up" className="font-semibold text-blue-1 hover:underline">
+            Sign up
+          </a>
+        </p>
+      </div>
     </main>
   );
 }

@@ -2,7 +2,20 @@
 
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { currentUser } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
+
+const getUserIdFromCookie = (): string => {
+  const cookieStore = cookies();
+  const tokenCookie = cookieStore.get('firebase-auth-token');
+  if (!tokenCookie?.value) throw new Error('Unauthorized');
+
+  const payload = JSON.parse(
+    Buffer.from(tokenCookie.value.split('.')[1], 'base64').toString('utf8')
+  );
+  const userId: string = payload.user_id || payload.sub;
+  if (!userId) throw new Error('Could not extract user ID from token');
+  return userId;
+};
 
 export const saveMeetingToFirestore = async (meetingData: {
   streamId: string;
@@ -10,15 +23,11 @@ export const saveMeetingToFirestore = async (meetingData: {
   startsAt: string;
 }) => {
   try {
-    const user = await currentUser();
-    if (!user) {
-      console.error("Unauthorized: No user found");
-      return { success: false, error: "Unauthorized" };
-    }
+    const userId = getUserIdFromCookie();
 
     const docRef = await addDoc(collection(db, "meetings"), {
       streamId: meetingData.streamId,
-      creatorId: user.id,
+      creatorId: userId,
       description: meetingData.description,
       startsAt: meetingData.startsAt,
       createdAt: serverTimestamp(),
@@ -33,14 +42,13 @@ export const saveMeetingToFirestore = async (meetingData: {
 
 export const getMeetingsFromFirestore = async () => {
   try {
-    const user = await currentUser();
-    if (!user) throw new Error("Unauthorized");
+    const userId = getUserIdFromCookie();
 
     const { getDocs, query, collection, where, orderBy } = await import("firebase/firestore");
-    
+
     const q = query(
       collection(db, "meetings"),
-      where("creatorId", "==", user.id),
+      where("creatorId", "==", userId),
       orderBy("createdAt", "desc")
     );
 

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import HomeCard from './HomeCard';
 import MeetingModal from './MeetingModal';
 import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
-import { useUser } from '@clerk/nextjs';
+import { useFirebaseUser } from '@/providers/FirebaseAuthProvider';
 import Loader from './Loader';
 import { Textarea } from './ui/textarea';
 import ReactDatePicker from 'react-datepicker';
@@ -29,7 +29,7 @@ const MeetingTypeList = () => {
   const [values, setValues] = useState(initialValues);
   const [callDetail, setCallDetail] = useState<Call>();
   const client = useStreamVideoClient();
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const { toast } = useToast();
 
   const createMeeting = async () => {
@@ -61,28 +61,24 @@ const MeetingTypeList = () => {
           description,
           startsAt,
         });
-
       } catch (dbError) {
         console.error('Failed to save to Firebase:', dbError);
-        // We don't block the user if DB fails, as the meeting is already in Stream
       }
 
       setCallDetail(call);
       if (!values.description) {
         router.push(`/meeting/${call.id}`);
       }
-      toast({
-        title: 'Meeting Created',
-      });
+      toast({ title: 'Meeting Created' });
     } catch (error) {
       console.error(error);
       toast({ title: 'Failed to create Meeting' });
     }
   };
 
-  if (!client || !user) return <Loader />;
-
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetail?.id}`;
+
+  const isClientReady = !!client && !!user;
 
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -90,21 +86,30 @@ const MeetingTypeList = () => {
         img="/icons/add-meeting.svg"
         title="New Meeting"
         description="Start an instant meeting"
-        handleClick={() => setMeetingState('isInstantMeeting')}
+        handleClick={() => {
+          if (!isClientReady) return toast({ title: 'Connecting to server...' });
+          setMeetingState('isInstantMeeting');
+        }}
       />
       <HomeCard
         img="/icons/join-meeting.svg"
         title="Join Meeting"
         description="via invitation link"
         className="bg-blue-1"
-        handleClick={() => setMeetingState('isJoiningMeeting')}
+        handleClick={() => {
+          if (!isClientReady) return toast({ title: 'Connecting to server...' });
+          setMeetingState('isJoiningMeeting');
+        }}
       />
       <HomeCard
         img="/icons/schedule.svg"
         title="Schedule Meeting"
         description="Plan your meeting"
         className="bg-purple-1"
-        handleClick={() => setMeetingState('isScheduleMeeting')}
+        handleClick={() => {
+          if (!isClientReady) return toast({ title: 'Connecting to server...' });
+          setMeetingState('isScheduleMeeting');
+        }}
       />
       <HomeCard
         img="/icons/recordings.svg"
@@ -113,6 +118,13 @@ const MeetingTypeList = () => {
         className="bg-yellow-1"
         handleClick={() => router.push('/recordings')}
       />
+
+      {!isClientReady && (
+        <div className="col-span-full flex items-center justify-center p-4">
+           <Loader />
+           <p className="ml-2 text-sky-2">Initializing services...</p>
+        </div>
+      )}
 
       {!callDetail ? (
         <MeetingModal
@@ -174,11 +186,11 @@ const MeetingTypeList = () => {
           try {
             await saveMeetingToFirestore({
               streamId: values.link.split('/').pop() || values.link,
-              description: "Joined Meeting",
+              description: 'Joined Meeting',
               startsAt: new Date().toISOString(),
             });
           } catch (e) {
-            console.error("Failed to log joined meeting:", e);
+            console.error('Failed to log joined meeting:', e);
           }
           router.push(values.link);
         }}
