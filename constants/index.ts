@@ -35,6 +35,11 @@ export const sidebarLinks = [
     route: '/profile',
     label: 'Profile',
   },
+  {
+    imgURL: '/icons/brain.svg',
+    route: '/meeting-intelligence',
+    label: 'Intelligence',
+  },
 ];
 
 export const avatarImages = [
