@@ -81,7 +81,8 @@ const MeetingTypeList = () => {
     }
   };
 
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetail?.id}`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+  const meetingLink = `${baseUrl}/meeting/${callDetail?.id}`;
 
   const isClientReady = !!client && !!user;
 

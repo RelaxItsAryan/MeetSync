@@ -106,14 +106,16 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
             if (meeting.description) {
               cardProps.title = meeting.description;
               cardProps.date = new Date(meeting.startsAt).toLocaleString();
-              cardProps.link = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.streamId}`;
+              const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+              cardProps.link = `${baseUrl}/meeting/${meeting.streamId}`;
             }
           } else {
             // upcoming (Stream Call object)
             cardProps.icon = '/icons/upcoming.svg';
             cardProps.title = (meeting as Call).state?.custom?.description || 'No Description';
             cardProps.date = (meeting as Call).state?.startsAt?.toLocaleString() || '';
-            cardProps.link = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${(meeting as Call).id}`;
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+            cardProps.link = `${baseUrl}/meeting/${(meeting as Call).id}`;
           }
 
           return (
