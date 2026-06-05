@@ -43,7 +43,7 @@ const CalendarPage = () => {
       await saveMeetingToFirestore({
         streamId: call.id,
         description: desc,
-        startsAt: startsAt,
+        startsAt,
       });
 
       toast({ title: 'Meeting Created' });

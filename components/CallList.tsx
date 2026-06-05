@@ -73,7 +73,7 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
       {calls && calls.length > 0 ? (
         calls.map((meeting: any) => {
           // Determine data source and format props for MeetingCard
-          let cardProps = {
+          const cardProps = {
             id: meeting.id || meeting.streamId,
             icon: '',
             title: '',
