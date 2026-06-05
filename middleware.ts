@@ -4,7 +4,6 @@ import type { NextRequest } from 'next/server';
 const protectedRoutes = [
   '/',
   '/upcoming',
-  '/previous',
   '/recordings',
   '/personal-room',
   '/calendar',

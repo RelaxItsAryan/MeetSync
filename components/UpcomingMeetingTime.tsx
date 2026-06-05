@@ -17,8 +17,8 @@ const UpcomingMeetingTime = () => {
     : 'No upcoming meetings';
 
   return (
-    <div className="glassmorphism flex max-w-fit items-center gap-2 rounded border border-white/10 px-3 py-1.5 text-sm font-normal shadow-lg">
-      <div className="size-1.5 animate-pulse rounded-full bg-orange-1" />
+    <div className="glassmorphism flex max-w-fit items-center gap-3 rounded-full border border-white/10 px-4 py-2 text-sm font-normal shadow-lg backdrop-blur-md">
+      <div className="size-2 animate-pulse rounded-full bg-blue-1 shadow-[0_0_10px_rgba(79,70,229,0.5)]" />
       <span className="font-medium tracking-tight text-sky-2/80">Next Meeting:</span>
       <span className="font-semibold text-white">{time}</span>
     </div>

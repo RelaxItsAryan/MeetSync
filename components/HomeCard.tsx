@@ -16,18 +16,18 @@ const HomeCard = ({ className, img, title, description, handleClick }: HomeCardP
   return (
     <section
       className={cn(
-        'bg-orange-1 px-4 py-6 flex flex-col justify-between w-full xl:max-w-[270px] min-h-[260px] rounded-[14px] cursor-pointer',
+        'bg-orange-1 px-6 py-8 flex flex-col justify-between w-full xl:max-w-[270px] min-h-[260px] rounded-2xl cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border border-white/5',
         className
       )}
       onClick={handleClick}
     >
-      <div className="flex-center glassmorphism size-12 rounded-[10px]">
-        <Image src={img} alt="meeting" width={27} height={27} />
+      <div className="flex-center glassmorphism size-14 rounded-xl shadow-inner">
+        <Image src={img} alt="meeting" width={32} height={32} />
       </div>
-      
+
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold">{title}</h1>
-        <p className="text-lg font-normal">{description}</p>
+        <h1 className="text-2xl font-bold tracking-tight text-white">{title}</h1>
+        <p className="text-lg font-medium text-white/70">{description}</p>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -28,9 +29,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex-between fixed z-50 w-full bg-dark-1 px-6 py-4 lg:px-10">
+    <nav className="flex-between fixed z-50 w-full glassmorphism2 px-6 py-3 lg:px-10 border-b border-white/5">
       <Link href="/" className="flex items-center gap-1">
-        <img
+        <Image
           src="/icons/logo.svg"
           width={32}
           height={32}

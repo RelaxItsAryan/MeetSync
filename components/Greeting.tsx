@@ -10,7 +10,7 @@ const Greeting = () => {
   const name = user?.displayName || user?.email?.split('@')[0] || 'User';
 
   return (
-    <h1 className="text-3xl font-extrabold lg:text-5xl text-white">
+    <h1 className="text-3xl font-extrabold lg:text-5xl text-white tracking-tight mb-2">
       Welcome back, {name}!
     </h1>
   );

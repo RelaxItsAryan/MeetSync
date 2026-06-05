@@ -31,13 +31,13 @@ const MeetingCard = ({
   const { toast } = useToast();
 
   return (
-    <section className="flex min-h-[258px] w-full flex-col justify-between rounded-[14px] bg-dark-1 px-5 py-8 xl:max-w-[568px]">
+    <section className="flex min-h-[258px] w-full flex-col justify-between rounded-2xl card-gradient px-7 py-8 xl:max-w-[568px] border border-white/5 shadow-xl transition-all hover:shadow-2xl">
       <article className="flex flex-col gap-5">
         <Image src={icon} alt="upcoming" width={28} height={28} />
         <div className="flex justify-between">
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-bold">{title}</h1>
-            <p className="text-base font-normal">{date}</p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">{title}</h1>
+            <p className="text-base font-medium text-zinc-400">{date}</p>
           </div>
         </div>
       </article>

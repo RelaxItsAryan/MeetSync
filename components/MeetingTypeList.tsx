@@ -127,8 +127,8 @@ const MeetingTypeList = () => {
 
       {!isClientReady && (
         <div className="col-span-full flex items-center justify-center p-4">
-           <Loader />
-           <p className="ml-2 text-sky-2">Initializing services...</p>
+          <Loader />
+          <p className="ml-2 text-sky-2">Initializing services...</p>
         </div>
       )}
 

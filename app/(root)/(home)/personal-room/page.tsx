@@ -16,11 +16,11 @@ const Table = ({
   description: string;
 }) => {
   return (
-    <div className="flex flex-col items-start gap-2 xl:flex-row">
-      <h1 className="text-base font-medium text-sky-1 lg:text-xl xl:min-w-32">
-        {title}:
+    <div className="flex flex-col items-start gap-2 xl:flex-row xl:items-center py-2 border-b border-white/5">
+      <h1 className="text-base font-medium text-zinc-400 lg:text-lg xl:min-w-40">
+        {title}
       </h1>
-      <h1 className="truncate text-sm font-bold max-sm:max-w-[320px] lg:text-xl">
+      <h1 className="truncate text-sm font-semibold max-sm:max-w-[320px] lg:text-lg text-white">
         {description}
       </h1>
     </div>
@@ -81,11 +81,11 @@ const PersonalRoom = () => {
         <Table title="Invite Link" description={meetingLink} />
       </div>
       <div className="flex gap-5">
-        <Button className="bg-blue-1" onClick={startRoom}>
+        <Button className="bg-blue-1 hover:bg-blue-1/90 transition-all rounded-xl px-8 py-6 text-lg font-semibold" onClick={startRoom}>
           Start Meeting
         </Button>
         <Button
-          className="bg-dark-3"
+          className="bg-dark-3 hover:bg-dark-4 transition-all rounded-xl px-8 py-6 text-lg font-semibold"
           onClick={() => {
             navigator.clipboard.writeText(meetingLink);
             toast({ title: 'Link Copied' });
