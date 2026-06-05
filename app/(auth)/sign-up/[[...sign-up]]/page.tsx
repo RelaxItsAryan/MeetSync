@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { User, Mail, Lock, XCircle } from 'lucide-react';
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -18,6 +19,9 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [nameError, setNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const setAuthCookie = async (user: import('firebase/auth').User) => {
     const token = await user.getIdToken();
@@ -27,6 +31,32 @@ export default function SignUpPage() {
   const handleEmailSignUp = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setNameError('');
+    setEmailError('');
+    setPasswordError('');
+
+    let hasError = false;
+    if (!name) {
+      setNameError('Please enter a display name');
+      hasError = true;
+    }
+    if (!email) {
+      setEmailError('Please enter an email address');
+      hasError = true;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError('Please enter a valid email address');
+      hasError = true;
+    }
+    if (!password) {
+      setPasswordError('Please enter a password');
+      hasError = true;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
     setLoading(true);
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -44,6 +74,9 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     setError('');
+    setNameError('');
+    setEmailError('');
+    setPasswordError('');
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
@@ -58,90 +91,209 @@ export default function SignUpPage() {
   };
 
   return (
-    <main className="flex h-screen w-full items-center justify-center bg-dark-2">
-      <div className="w-full max-w-md rounded-2xl border border-dark-3 bg-dark-1 p-8 shadow-2xl">
-        {/* Logo */}
-        <div className="mb-8 flex flex-col items-center gap-2">
-          <Image src="/icons/logo.svg" width={48} height={48} alt="MeetSync logo" />
-          <h1 className="text-2xl font-extrabold text-white">Create account</h1>
-          <p className="text-sm text-sky-2">Join MeetSync today</p>
-        </div>
+    <main className="flex h-screen w-full bg-white text-black font-sans overflow-hidden">
+      {/* Left Column: Image */}
+      <div className="relative hidden w-1/2 md:block h-screen bg-gray-100">
+        <Image
+          src="/images/auth.png"
+          alt="Authentication Background"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
 
-        {/* Error */}
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-            {error}
+      {/* Right Column: Form */}
+      <div className="flex w-full md:w-1/2 h-screen flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-24 xl:px-32 bg-white">
+        <div className="mx-auto w-full max-w-[400px] flex flex-col gap-6">
+          {/* Logo */}
+          <div>
+            <Image
+              src="/icons/logo.svg"
+              width={48}
+              height={48}
+              alt="MeetSync logo"
+              className="h-12 w-auto"
+            />
           </div>
-        )}
 
-        {/* Form */}
-        <form onSubmit={handleEmailSignUp} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm text-sky-2">Display Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:ring-2 focus:ring-blue-1"
-            />
+          {/* Heading */}
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900">Create Account</h1>
+            <div className="mt-4 h-px w-full bg-gray-200" />
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm text-sky-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="you@example.com"
-              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:ring-2 focus:ring-blue-1"
-            />
+
+          {/* Error Alert */}
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleEmailSignUp} className="flex flex-col gap-4">
+            {/* Display Name Input */}
+            <div className="flex flex-col gap-1">
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <User className="h-5 w-5" />
+                </span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (nameError) setNameError('');
+                  }}
+                  placeholder="Your display name"
+                  className={`w-full rounded-2xl py-4 pl-12 pr-12 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all border ${
+                    nameError
+                      ? 'border-red-500 bg-[#FAF5F5]'
+                      : 'border-gray-200 bg-gray-50 focus:border-gray-300 focus:bg-white'
+                  }`}
+                />
+                {nameError && (
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500">
+                    <XCircle className="h-5 w-5" />
+                  </span>
+                )}
+              </div>
+              {nameError && (
+                <span className="text-right text-xs italic text-red-500 mt-1 block">
+                  {nameError}
+                </span>
+              )}
+            </div>
+
+            {/* Email Input */}
+            <div className="flex flex-col gap-1">
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Mail className="h-5 w-5" />
+                </span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailError) setEmailError('');
+                  }}
+                  placeholder="Your email"
+                  className={`w-full rounded-2xl py-4 pl-12 pr-12 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all border ${
+                    emailError
+                      ? 'border-red-500 bg-[#FAF5F5]'
+                      : 'border-gray-200 bg-gray-50 focus:border-gray-300 focus:bg-white'
+                  }`}
+                />
+                {emailError && (
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500">
+                    <XCircle className="h-5 w-5" />
+                  </span>
+                )}
+              </div>
+              {emailError && (
+                <span className="text-right text-xs italic text-red-500 mt-1 block">
+                  {emailError}
+                </span>
+              )}
+            </div>
+
+            {/* Password Input */}
+            <div className="flex flex-col gap-1">
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Lock className="h-5 w-5" />
+                </span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) setPasswordError('');
+                  }}
+                  placeholder="Your password"
+                  className={`w-full rounded-2xl py-4 pl-12 pr-12 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all border ${
+                    passwordError
+                      ? 'border-red-500 bg-[#FAF5F5]'
+                      : 'border-gray-200 bg-gray-50 focus:border-gray-300 focus:bg-white'
+                  }`}
+                />
+                {passwordError && (
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500">
+                    <XCircle className="h-5 w-5" />
+                  </span>
+                )}
+              </div>
+              {passwordError && (
+                <span className="text-right text-xs italic text-red-500 mt-1 block">
+                  {passwordError}
+                </span>
+              )}
+            </div>
+
+            {/* Sign Up Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 w-full rounded-full border border-black bg-white py-3.5 text-center text-sm font-semibold text-black transition-all hover:bg-gray-50 disabled:opacity-60"
+            >
+              {loading ? 'Creating account…' : 'Sign Up'}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200" />
+            <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">or</span>
+            <div className="h-px flex-1 bg-gray-200" />
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm text-sky-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              placeholder="Min. 6 characters"
-              className="rounded-lg bg-dark-3 px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:ring-2 focus:ring-blue-1"
-            />
-          </div>
+
+          {/* Google Sign-Up */}
           <button
-            type="submit"
+            onClick={handleGoogleSignUp}
             disabled={loading}
-            className="mt-2 rounded-lg bg-blue-1 py-3 font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white py-3.5 text-sm font-semibold text-black transition-all hover:bg-gray-50 disabled:opacity-60"
           >
-            {loading ? 'Creating account…' : 'Sign Up'}
+            <Image
+              src="/icons/google.svg"
+              width={20}
+              height={20}
+              alt="Google logo"
+            />
+            Continue with Google
           </button>
-        </form>
 
-        {/* Divider */}
-        <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-dark-3" />
-          <span className="text-sm text-sky-2">or</span>
-          <div className="h-px flex-1 bg-dark-3" />
+          {/* Links Block */}
+          <div className="border-l-2 border-gray-200 pl-4 py-1 flex flex-col gap-2.5 text-sm text-gray-500">
+            <div>
+              Already have an account?{' '}
+              <a
+                href="/sign-in"
+                className="font-bold underline text-black hover:text-gray-700"
+              >
+                Sign in
+              </a>
+            </div>
+            <div>
+              Forgot your password?{' '}
+              <a
+                href="#"
+                className="font-bold underline text-black hover:text-gray-700"
+              >
+                Reset password
+              </a>
+            </div>
+            <div>
+              Need support?{' '}
+              <a
+                href="mailto:support@meetsync.com"
+                className="font-bold underline text-black hover:text-gray-700"
+              >
+                Send us an email
+              </a>
+            </div>
+          </div>
         </div>
-
-        {/* Google Sign Up */}
-        <button
-          onClick={handleGoogleSignUp}
-          disabled={loading}
-          className="flex w-full items-center justify-center gap-3 rounded-lg border border-dark-3 bg-dark-3 py-3 font-medium text-white transition hover:bg-dark-4 disabled:opacity-60"
-        >
-          <Image src="/icons/google.svg" width={20} height={20} alt="Google" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-          Continue with Google
-        </button>
-
-        {/* Sign In link */}
-        <p className="mt-6 text-center text-sm text-sky-2">
-          Already have an account?{' '}
-          <a href="/sign-in" className="font-semibold text-blue-1 hover:underline">
-            Sign in
-          </a>
-        </p>
       </div>
     </main>
   );
