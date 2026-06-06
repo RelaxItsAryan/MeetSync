@@ -1,4 +1,4 @@
-# I Trapped Promises Inside Meeting Transcripts With Hindsight
+# How to track broken developer promises using meeting history
 
 When you finish a meeting, something gets lost. It's not the recording—that lives safely in Firebase. It's not the notes—those exist somewhere in your Slack channel or notebook app. What vanishes is the *context*. The specific promise someone made about pricing in week three. The risk flag that came up casually in conversation. The emotional undertone of a discussion about resourcing. That stuff evaporates. Then three weeks later, your manager asks what happened with the pricing promise, and you're hunting through video timestamps instead of actually answering the question.
 
