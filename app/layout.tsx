@@ -7,12 +7,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseAuthProvider } from "@/providers/FirebaseAuthProvider";
+import { AtmosphereProvider } from "@/providers/AtmosphereProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "MeetSync",
-  description: "Video calling App",
+  description: "Sensory Workspace",
   icons: {
     icon: "/icons/logo.svg",
   },
@@ -25,8 +26,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-dark-2`}>
         <FirebaseAuthProvider>
-          <Toaster />
-          {children}
+          <AtmosphereProvider>
+            <Toaster />
+            {children}
+          </AtmosphereProvider>
         </FirebaseAuthProvider>
       </body>
     </html>

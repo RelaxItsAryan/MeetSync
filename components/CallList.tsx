@@ -110,7 +110,7 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
             link: '',
             buttonIcon1: undefined as string | undefined,
             buttonText: 'Start',
-            isPreviousMeeting: type === 'ended',
+            isPreviousMeeting: type === 'ended' || type === 'recordings',
           };
 
           if (type === 'recordings') {

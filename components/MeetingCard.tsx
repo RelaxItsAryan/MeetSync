@@ -1,17 +1,15 @@
 "use client";
 
 import Image from "next/image";
-
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { avatarImages } from "@/constants";
 import { useToast } from "./ui/use-toast";
-
-import { useState, useEffect } from "react";
+import { useFirebaseUser } from "@/providers/FirebaseAuthProvider";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { Sparkles, Loader2 } from "lucide-react";
 import { AnalysisPanel } from "./AnalysisPanel";
-import { Sparkles } from "lucide-react";
 
 interface MeetingCardProps {
   id: string;
@@ -41,58 +39,59 @@ const MeetingCard = ({
   onDelete,
 }: MeetingCardProps) => {
   const { toast } = useToast();
+  const { user } = useFirebaseUser();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
-  const [hasAnalysis, setHasAnalysis] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   useEffect(() => {
-    const checkAnalysis = async () => {
-      if (type !== 'recordings' || !id) return;
-      try {
-        const docRef = doc(db, 'meeting_analyses', id);
+    if (isPreviousMeeting && id) {
+      const fetchAnalysis = async () => {
+        const docRef = doc(db, "meeting_analyses", id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setAnalysis(docSnap.data().analysis);
-          setHasAnalysis(true);
         }
-      } catch (error) {
-        console.error("Error checking analysis:", error);
-      }
-    };
+      };
+      fetchAnalysis();
+    }
+  }, [id, isPreviousMeeting]);
 
-    checkAnalysis();
-  }, [id, type]);
-
-  const handleAnalyze = async () => {
-    if (hasAnalysis) {
+  const handleAnalyze = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (analysis) {
       setIsAnalysisOpen(true);
       return;
     }
 
     setIsAnalyzing(true);
     try {
-      const response = await fetch('/api/analyze-recording', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/analyze-recording", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           video_url: link,
           recording_id: id,
           meeting_title: title,
+          meeting_date: date,
+          userId: user?.uid,
         }),
       });
 
       const data = await response.json();
       if (data.success) {
         setAnalysis(data.analysis);
-        setHasAnalysis(true);
         setIsAnalysisOpen(true);
-        toast({ title: "Analysis Complete" });
+        toast({ title: "Analysis Complete", description: "Meeting memory synced to Hindsight." });
       } else {
-        toast({ title: data.error || "Analysis failed", variant: "destructive" });
+        throw new Error(data.error);
       }
     } catch (error: any) {
-      toast({ title: error.message || "An error occurred", variant: "destructive" });
+      toast({
+        title: "Analysis Failed",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -119,23 +118,6 @@ const MeetingCard = ({
                 )}
                 &nbsp; {buttonText}
               </Button>
-
-              {type === 'recordings' && (
-                <Button
-                  onClick={handleAnalyze}
-                  disabled={isAnalyzing}
-                  className="rounded bg-dark-4 px-6 border border-white/10 hover:bg-dark-3 transition-all"
-                >
-                  {isAnalyzing ? (
-                    "Analyzing..."
-                  ) : (
-                    <>
-                      <Sparkles className="size-4 mr-2 text-blue-1" />
-                      {hasAnalysis ? "View Analysis" : "Analyze"}
-                    </>
-                  )}
-                </Button>
-              )}
             </div>
             
             <div className="flex gap-2">
@@ -171,17 +153,60 @@ const MeetingCard = ({
             </div>
           </div>
         )}
+
+        {isPreviousMeeting && (
+          <div className="flex gap-2 w-full justify-between items-center">
+             <div className="flex gap-2 items-center">
+                <Button onClick={handleClick} className="rounded bg-blue-1 px-6">
+                    <Image src="/icons/play.svg" alt="play" width={20} height={20} />
+                    &nbsp; Play
+                </Button>
+                
+                <Button 
+                    onClick={handleAnalyze} 
+                    disabled={isAnalyzing}
+                    className={cn(
+                        "rounded px-6 border border-blue-1/20 transition-all",
+                        analysis ? "bg-blue-1/10 text-blue-1 hover:bg-blue-1/20" : "bg-dark-3 text-white hover:bg-dark-4"
+                    )}
+                >
+                    {isAnalyzing ? (
+                        <Loader2 className="size-4 animate-spin mr-2" />
+                    ) : (
+                        <Sparkles className={cn("size-4 mr-2", analysis ? "text-blue-1" : "text-zinc-500")} />
+                    )}
+                    {analysis ? "View Insights" : "Analyze"}
+                </Button>
+             </div>
+
+             <div className="flex gap-2">
+                <Button
+                    onClick={() => {
+                        navigator.clipboard.writeText(link);
+                        toast({ title: "Link Copied" });
+                    }}
+                    className="bg-dark-4 px-4"
+                >
+                    <Image src="/icons/copy.svg" alt="copy" width={20} height={20} />
+                </Button>
+
+                {onDelete && (
+                    <Button onClick={onDelete} className="bg-red-500 hover:bg-red-600 px-3">
+                        <Image src="/icons/delete.svg" alt="delete" width={20} height={20} />
+                    </Button>
+                )}
+             </div>
+          </div>
+        )}
       </article>
 
-      {analysis && (
-        <AnalysisPanel
-          isOpen={isAnalysisOpen}
-          onClose={() => setIsAnalysisOpen(false)}
-          analysis={analysis}
-          title={title}
-          recordingId={id}
-        />
-      )}
+      <AnalysisPanel 
+        isOpen={isAnalysisOpen} 
+        onClose={() => setIsAnalysisOpen(false)} 
+        analysis={analysis} 
+        title={title} 
+        recordingId={id} 
+      />
     </section>
   );
 };

@@ -32,8 +32,13 @@ export const sidebarLinks = [
   },
   {
     imgURL: '/icons/brain.svg',
-    route: '/meeting-intelligence',
+    route: '/intelligence',
     label: 'Intelligence',
+  },
+  {
+    imgURL: '/icons/recordings.svg',
+    route: '/atmosphere',
+    label: 'Atmosphere',
   },
 ];
 

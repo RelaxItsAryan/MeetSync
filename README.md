@@ -1,84 +1,58 @@
-# 🤖 MeetSync: Multi-Agent Meeting Intelligence Ecosystem
+# 🕯️ MeetSync: The Sensory Meeting Workspace
 
-MeetSync is not just a video calling platform—it's a sophisticated **Multi-Agent AI Ecosystem** designed to automate meeting management, commitment tracking, and enterprise-grade accountability. By deploying a suite of specialized AI Agents, MeetSync transforms every conversation into a structured database of actionable intelligence.
+MeetSync is a video conferencing platform reimagined for individual focus and sensory comfort. Moving away from standard corporate tools, MeetSync prioritizes the **human experience** of digital collaboration through curated environments and tactile documentation.
 
-![MeetSync Banner](https://img.shields.io/badge/AI%20Agents-Llama%203.3%20%2B%20Whisper-orange?style=for-the-badge)
-![Accountability Engine](https://img.shields.io/badge/Engine-Accountability%20Intelligence-blue?style=for-the-badge)
-![Groq Powered](https://img.shields.io/badge/Powered%20By-Groq-green?style=for-the-badge)
-
----
-
-## 🧠 The Multi-Agent Intelligence System
-
-MeetSync operates using three core specialized agents that process meeting data in a pipeline to ensure maximum accuracy and depth.
-
-### 1. 📋 The Intelligence Extraction Agent
-This agent performs the primary post-meeting analysis, converting audio into high-fidelity structured data.
-*   **Deep Summary & Sentiment**: Goes beyond basic notes to capture the emotional tone and outcomes.
-*   **Commitment Intelligence**: Automatically identifies promises, obligations, and deliverables.
-*   **Risk & Blocker Detection**: Flags potential future problems (risks) versus active progress-preventers (blockers).
-*   **Structured Output**: Generates valid JSON intelligence covering decisions, questions raised, and participant intent.
-
-### 2. ⚖️ The Accountability Engine (Agent 3)
-The "Brain" of MeetSync's persistence. It compares the current meeting with your organization's entire history.
-*   **Historical Alignment**: Syncs current promises with past commitments to check for consistency.
-*   **Reliability Scoring**: Assigns a **Reliability Score (0-100)** to participants based on their track record of completing deliverables.
-*   **Pattern Recognition**: Detects repeated delays or circular commitments (e.g., the same approval promised in three consecutive meetings).
-*   **Escalation Alerts**: Automatically identifies if an overdue task creates a critical downstream launch risk.
-
-### 3. 🎯 The Strategic Preparation Agent
-Acts as your personal advisor before you even enter the room.
-*   **Executive Briefings**: Summarizes relationship history and project status in 3-5 high-impact sentences.
-*   **Recommended Strategy**: Advises on how to approach a meeting based on the participants' historical reliability and open items.
-*   **Dynamic Questioning**: Generates "hard questions" to move projects forward based on identified blockers.
+![MeetSync Banner](https://img.shields.io/badge/Focus-Atmospheric%20Conferencing-orange?style=for-the-badge)
+![Zen Sync](https://img.shields.io/badge/Feature-Zen%20Sync-blue?style=for-the-badge)
+![Parchment Theme](https://img.shields.io/badge/Aesthetic-Parchment%20Modern-green?style=for-the-badge)
 
 ---
 
-## 🚀 Advanced Analysis Features
+## 🌿 Unique Feature: Zen Sync (Atmospheric Environments)
 
-*   **Interactive Meeting Q&A**: Each recording becomes a searchable knowledge base. Ask "Who agreed to the API change?" or "What was the budget concern?" and get cited answers instantly.
-*   **Relationship Intelligence**: Understand participant dynamics over time, including consistency, sentiment trends, and past collaboration hurdles.
-*   **Real-time Intelligence Pipeline**: Processes video recordings directly from Stream.io through **Groq's Whisper-large-v3** and **Llama-3.3-70b** for near-instant results.
+MeetSync introduces **Zen Sync**, a revolutionary way to battle meeting fatigue by synchronizing the sensory environment of your digital workspace. 
 
----
+*   **Curated Scapes**: Choose between environments like *Ancient Library*, *Midnight Code*, or *Rainy Haven*.
+*   **Dedicated Atmosphere Panel**: A new sidebar-accessible workspace to manage your sensory immersion and focus settings.
+*   **Sensory Immersion**: Each scape dynamically adjusts the UI color palette, CSS filters (sepia, contrast, brightness), and introduces high-quality ambient soundscapes.
+*   **Focus-Driven UX**: By altering the visual and auditory field, individuals can enter "Flow States" more easily during long sessions.
+*   **Adaptive Theme**: The application's "Parchment Modern" aesthetic scales with your mood, from warm, tactile tones to deep, high-contrast dark modes.
 
-## 🛠️ The Technology Behind the Intelligence
-
-| Layer | Component | Implementation |
-| :--- | :--- | :--- |
-| **LLM Inference** | **Groq LPU™** | Blazing-fast Llama 3.3 70B & Whisper-v3 |
-| **Memory** | **Cloud Firestore** | Persistent storage for historical commitments & reliability matrices |
-| **Video Engine** | **Stream.io** | High-fidelity recording and low-latency conferencing |
-| **Framework** | **Next.js 14** | Secure Server Actions and highly responsive UI |
-
----
-
-## 🎨 Aesthetic: Parchment Modern
-MeetSync utilizes a custom **Parchment Modern** design system. This isn't just a theme; it's a productivity-focused interface that combines high-contrast typography (Playfair Display) with warm, non-fatiguing backgrounds, making long analysis sessions comfortable for the eyes.
+## 📹 Full-Featured Personal Conferencing
+*   **Video Mastery**: Powered by Stream.io for ultra-low latency calls.
+*   **Personal Archives**: Manage and host your own meeting recordings securely via Firebase.
+*   **Link Privacy**: Generate and share meeting links with instant clipboard sync.
+*   **Meeting History**: A beautiful, organized history of every session with quick-play capabilities.
 
 ---
 
-## 📦 Getting Started
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Engine** | [Next.js 14](https://nextjs.org/) (App Router) |
+| **Environment** | **Adaptive CSS Filters & HSL Morphing** |
+| **Database** | [Firestore](https://firebase.google.com/products/firestore) & [Firebase Auth](https://firebase.google.com/products/auth) |
+| **Video Engine** | [Stream.io SDK](https://getstream.io/video/docs/react/) |
+| **Typography** | Playfair Display & Inter |
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 *   Node.js 18+ 
-*   Groq API Key (Llama 3.3 and Whisper support)
-*   Firebase (Auth & Firestore)
-*   Stream.io (Video SDK)
+*   Firebase Project (Auth & Storage)
+*   Stream.io API Key
 
 ### Environment Setup
 ```env
-# AI & INFRASTRUCTURE
-GROQ_API_KEY=gsk_...
+NEXT_PUBLIC_FIREBASE_API_KEY=...
 NEXT_PUBLIC_STREAM_API_KEY=...
 STREAM_SECRET_KEY=...
-
-# PERSISTENCE
-NEXT_PUBLIC_FIREBASE_API_KEY=...
-# ... other firebase keys
 ```
 
-### Quick Run
+### Installation
 ```bash
 npm install
 npm run dev
@@ -91,4 +65,4 @@ Distributed under the MIT License.
 
 ---
 
-**MeetSync** — *From Conversations to Commitment Intelligence.*
+**MeetSync** — *Work in Harmony.*

@@ -2,38 +2,47 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
 export async function POST(req: Request) {
   try {
-    const { recording_id, message, history } = await req.json();
+    const body = await req.json();
+    const { recording_id, message, history } = body;
 
     if (!recording_id || !message) {
       return NextResponse.json({ error: 'Missing recording_id or message' }, { status: 400 });
     }
 
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
       return NextResponse.json({ error: 'Groq API Key not configured' }, { status: 500 });
     }
 
     // 1. Fetch transcript from Firestore
-    const analysisDoc = await getDoc(doc(db, 'meeting_analyses', recording_id));
-    if (!analysisDoc.exists()) {
-      return NextResponse.json({ error: 'Analysis/Transcript not found' }, { status: 404 });
+    const docRef = doc(db, "meeting_analyses", recording_id);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) {
+      return NextResponse.json({ error: 'No analysis found for this recording. Please analyze it first.' }, { status: 404 });
     }
 
-    const { transcript, meeting_title } = analysisDoc.data();
+    const { transcript, analysis, meeting_title } = docSnap.data();
 
-    // 2. Build Chat Prompt
-    const systemPrompt = `You are a meeting assistant for "${meeting_title}". 
-You have been provided with the transcript of the meeting. 
-Answer the user's questions based ONLY on the provided transcript.
-If the answer is not in the transcript, say you don't know based on the recorded information.
-Be concise and helpful.
+    // 2. Chat with Groq Llama-3.3
+    console.log(`[CHAT] Asking about recording ${recording_id}: ${message}`);
+    
+    const systemPrompt = `You are an AI meeting assistant for a platform called MeetSync. 
+You are helping a user with questions about the meeting titled "${meeting_title}".
 
-Transcript:
-${transcript}`;
+Context:
+- Transcript: ${transcript}
+- Summarized Insights: ${JSON.stringify(analysis)}
 
-    // 3. Call Groq Llama-3
+Instructions:
+- Answer the user's questions factualy based ONLY on the provided transcript and insights.
+- If you don't know the answer, say you don't know based on the transcript.
+- Be concise and professional.
+- Refer to specific moments or speakers if mentioned in the transcript.`;
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -44,10 +53,11 @@ ${transcript}`;
         model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: systemPrompt },
-          ...(history || []),
+          ...history.map((m: any) => ({ role: m.role, content: m.content })),
           { role: 'user', content: message }
         ],
-        temperature: 0.7
+        temperature: 0.5,
+        max_tokens: 1024
       }),
     });
 
@@ -57,9 +67,10 @@ ${transcript}`;
     }
 
     const data = await response.json();
-    const answer = data.choices[0].message.content;
+    const reply = data.choices[0].message.content;
 
-    return NextResponse.json({ answer });
+    return NextResponse.json({ reply });
+
   } catch (error: any) {
     console.error('Chat API Error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

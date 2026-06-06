@@ -1,15 +1,31 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
-import { MessageSquare, Send, User, Bot, Loader2, Sparkles, CheckCircle, ListTodo, AlertTriangle, Quote, Info } from 'lucide-react';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription 
+} from "@/components/ui/sheet";
+import { 
+  BadgeCheck, 
+  Target, 
+  Users, 
+  AlertTriangle, 
+  Quote, 
+  TrendingUp, 
+  BrainCircuit,
+  Calendar,
+  Send,
+  User,
+  Bot,
+  MessageSquare,
+  Clock
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useState, useRef, useEffect } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 interface AnalysisPanelProps {
   isOpen: boolean;
@@ -19,40 +35,46 @@ interface AnalysisPanelProps {
   recordingId: string;
 }
 
-const SentimentBadge = ({ sentiment }: { sentiment: string }) => {
-  const styles: Record<string, string> = {
-    positive: 'bg-green-500/20 text-green-400 border-green-500/30',
-    neutral: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-    negative: 'bg-red-500/20 text-red-400 border-red-500/30',
-    mixed: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  };
+export const AnalysisPanel = ({
+  isOpen,
+  onClose,
+  analysis,
+  title,
+  recordingId,
+}: AnalysisPanelProps) => {
+  const [activeTab, setActiveTab] = useState<"analysis" | "chat">("analysis");
+  const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <span className={cn('px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border', styles[sentiment?.toLowerCase()] || styles.neutral)}>
-      {sentiment || 'Neutral'}
-    </span>
-  );
-};
-
-export const AnalysisPanel = ({ isOpen, onClose, analysis, title, recordingId }: AnalysisPanelProps) => {
-  const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
-  const [input, setInput] = useState('');
-  const [isSending, setIsSending] = useState(false);
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isTyping]);
 
   if (!analysis) return null;
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isSending) return;
+  const sentimentColors: any = {
+    positive: "bg-green-500/10 text-green-500 border-green-500/20",
+    negative: "bg-red-500/10 text-red-500 border-red-500/20",
+    neutral: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    mixed: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+  };
 
-    const userMessage = input.trim();
-    setInput('');
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return;
+
+    const userMessage = chatInput;
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
-    setIsSending(true);
+    setChatInput("");
+    setIsTyping(true);
 
     try {
-      const response = await fetch('/api/chat-recording', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/chat-recording", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           recording_id: recordingId,
           message: userMessage,
@@ -61,213 +83,245 @@ export const AnalysisPanel = ({ isOpen, onClose, analysis, title, recordingId }:
       });
 
       const data = await response.json();
-      if (data.answer) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
-      } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.error || 'Sorry, I encountered an error answering your question.' }]);
+      if (data.reply) {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
       }
     } catch (error) {
-      console.error('Chat error:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }]);
+      console.error("Chat error:", error);
     } finally {
-      setIsSending(false);
+      setIsTyping(false);
     }
   };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-2xl bg-[#1C1F2E] border-l-white/5 text-white overflow-hidden flex flex-col p-0 shadow-2xl">
-        <SheetHeader className="p-8 border-b border-white/5 shrink-0 bg-[#1C1F2E]/80 backdrop-blur-xl">
+      <SheetContent className="w-full sm:max-w-[540px] bg-dark-2 border-white/5 text-white flex flex-col p-0">
+        <SheetHeader className="p-8 pb-0">
           <div className="flex items-center gap-3 mb-2">
-            <div className="bg-blue-1/20 p-2 rounded-lg border border-blue-1/30">
-              <Sparkles className="w-5 h-5 text-blue-1" />
+            <div className="p-2 rounded-lg bg-blue-1/10">
+               <BrainCircuit className="size-6 text-blue-1" />
             </div>
-            <SheetTitle className="text-2xl font-bold text-white tracking-tight leading-none italic font-serif">
-              Meeting Intelligence
-            </SheetTitle>
+            <div className="flex flex-col text-left">
+                <SheetTitle className="text-2xl font-bold text-white leading-tight">{title}</SheetTitle>
+                <SheetDescription className="text-zinc-500">AI Intelligence Analysis</SheetDescription>
+            </div>
           </div>
-          <SheetDescription className="text-zinc-400 text-sm font-medium">
-            Recording: {title}
-          </SheetDescription>
+          
+          {/* Tabs */}
+          <div className="flex gap-4 border-b border-white/5 mt-6">
+            <button 
+                onClick={() => setActiveTab("analysis")}
+                className={cn(
+                    "pb-3 text-sm font-semibold transition-all border-b-2",
+                    activeTab === "analysis" ? "text-blue-1 border-blue-1" : "text-zinc-500 border-transparent hover:text-zinc-300"
+                )}
+            >
+                Analysis
+            </button>
+            <button 
+                onClick={() => setActiveTab("chat")}
+                className={cn(
+                    "pb-3 text-sm font-semibold transition-all border-b-2",
+                    activeTab === "chat" ? "text-blue-1 border-blue-1" : "text-zinc-500 border-transparent hover:text-zinc-300"
+                )}
+            >
+                Ask Questions
+            </button>
+          </div>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto px-8 py-8 custom-scrollbar space-y-12">
-          <div className="space-y-12">
-            {/* Header / Top Stats */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-               <div className="flex items-center gap-4">
-                  <SentimentBadge sentiment={analysis.sentiment} />
-                  <div className="h-4 w-px bg-white/10" />
-                  <div className="flex items-center gap-2">
-                     <span className="text-sm font-bold text-zinc-500 uppercase tracking-tighter">Meeting Score</span>
-                     <span className="text-xl font-extrabold text-blue-1">{analysis.overall_score || 0}/10</span>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+            {activeTab === "analysis" ? (
+                <div className="flex flex-col gap-8 pb-10">
+                  <div className="flex gap-2 items-center">
+                    {analysis.sentiment && (
+                        <span className={cn(
+                            "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border",
+                            sentimentColors[analysis.sentiment] || sentimentColors.neutral
+                        )}>
+                            {analysis.sentiment} Sentiment
+                        </span>
+                    )}
+                    {analysis.deal_stage && analysis.deal_stage !== 'not_applicable' && (
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10 bg-white/5 text-zinc-400">
+                            {analysis.deal_stage.replace('_', ' ')}
+                        </span>
+                    )}
                   </div>
-               </div>
-               <div className="text-[10px] font-bold text-zinc-500 bg-white/5 px-2.5 py-1 rounded uppercase tracking-widest border border-white/5">
-                  Stage: {analysis.deal_stage?.replace(/_/g, ' ') || 'N/A'}
-               </div>
-            </div>
 
-            {/* Summary */}
-            <section className="space-y-4">
-              <h3 className="text-xs font-bold text-blue-1 uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 font-serif italic">
-                <Info className="w-3.5 h-3.5" /> Executive Summary
-              </h3>
-              <p className="text-lg leading-relaxed text-zinc-200 font-light italic bg-white/5 p-6 rounded-2xl border border-white/5">
-                "{analysis.summary}"
-              </p>
-            </section>
+                  <div className="flex flex-col gap-3">
+                    <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                        <Target className="size-4" /> Summary
+                    </h3>
+                    <p className="text-zinc-200 leading-relaxed italic border-l-2 border-blue-1/30 pl-4 py-1 text-sm">
+                        {analysis.summary}
+                    </p>
+                  </div>
 
-            {/* Next Steps */}
-            <section className="space-y-5">
-              <h3 className="text-xs font-bold text-blue-1 uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 font-serif italic">
-                <ListTodo className="w-3.5 h-3.5" /> Action Items
-              </h3>
-              <ul className="space-y-4">
-                {analysis.next_steps?.map((step: string, idx: number) => (
-                  <li key={idx} className="flex gap-4 items-start group">
-                    <span className="flex-none w-6 h-6 rounded-lg bg-blue-1/10 border border-blue-1/20 text-blue-1 text-[11px] flex items-center justify-center font-bold mt-0.5 group-hover:bg-blue-1 group-hover:text-white transition-all">
-                      {idx + 1}
-                    </span>
-                    <span className="text-sm text-zinc-300 py-1 leading-relaxed">{step}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
+                  <div className="flex flex-col gap-3">
+                        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                            <TrendingUp className="size-4 text-orange-1" /> Commitments & Dates
+                        </h3>
+                        <div className="flex flex-col gap-3">
+                            {analysis.promises_made?.map((p: any, i: number) => (
+                                <div key={i} className="text-sm border border-white/5 bg-white/5 p-4 rounded-xl flex flex-col gap-2">
+                                    <div className="flex justify-between items-start">
+                                        <span className="font-bold text-orange-1">{p.by}</span>
+                                        {p.deadline && p.deadline !== 'not specified' && (
+                                            <span className="text-[10px] bg-orange-1/10 text-orange-1 px-2 py-0.5 rounded border border-orange-1/20 flex items-center gap-1 uppercase font-bold">
+                                                <Clock className="size-3" /> {p.deadline}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-zinc-300">{p.promise}</p>
+                                </div>
+                            ))}
+                        </div>
+                  </div>
 
-            {/* Promises Made */}
-            <section className="space-y-5">
-              <h3 className="text-xs font-bold text-blue-1 uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 font-serif italic">
-                <CheckCircle className="w-3.5 h-3.5" /> Promises & Commitments
-              </h3>
-              <div className="grid gap-4">
-                {analysis.promises_made?.map((promise: any, idx: number) => (
-                  <div key={idx} className="bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col gap-3 hover:border-blue-1/30 transition-all">
-                    <p className="text-sm text-zinc-200 leading-relaxed font-medium">{promise.promise}</p>
-                    <div className="flex justify-between items-center text-[10px]">
-                      <span className="font-bold text-blue-1/80 uppercase tracking-widest">OWNER: {promise.by}</span>
-                      {promise.deadline && (
-                        <span className="text-zinc-500 bg-white/5 px-2 py-1 rounded border border-white/10">DEADLINE: {promise.deadline}</span>
-                      )}
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="flex flex-col gap-3">
+                        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                            <BadgeCheck className="size-4 text-green-500" /> Action Items
+                        </h3>
+                        <ul className="flex flex-col gap-2">
+                            {analysis.next_steps?.map((step: string, i: number) => (
+                                <li key={i} className="text-sm text-zinc-300 bg-white/5 p-3 rounded-lg border border-white/5">
+                                    {step}
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                   </div>
-                ))}
-              </div>
-            </section>
 
-            {/* Risk Flags */}
-            {analysis.risk_flags && analysis.risk_flags.length > 0 && (
-              <section className="space-y-4">
-                <h3 className="text-xs font-bold text-red-400 uppercase tracking-[0.2em] flex items-center gap-2 font-serif italic">
-                  <AlertTriangle className="w-3.5 h-3.5" /> High Risk Flags
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {analysis.risk_flags.map((flag: string, idx: number) => (
-                    <span key={idx} className="bg-red-500/10 text-red-400 text-[10px] px-3 py-1.5 rounded-lg border border-red-500/20 font-bold uppercase tracking-wider">
-                      {flag}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Key Quotes */}
-            <section className="space-y-5">
-              <h3 className="text-xs font-bold text-blue-1 uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 font-serif italic">
-                <Quote className="w-3.5 h-3.5" /> Key Moments
-              </h3>
-              <div className="space-y-5">
-                {analysis.key_quotes?.map((quote: string, idx: number) => (
-                  <div key={idx} className="relative pl-8 py-1">
-                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-1/20 rounded-full" />
-                    <p className="text-sm italic text-zinc-400 leading-relaxed">"{quote}"</p>
+                  {/* Topics & Participants */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="flex flex-col gap-3">
+                        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                            <Calendar className="size-4" /> Topics
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                            {analysis.topics_discussed?.map((topic: string, i: number) => (
+                                <span key={i} className="px-2 py-1 bg-dark-3 text-zinc-400 text-[10px] rounded border border-white/10 uppercase font-semibold">
+                                    {topic}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                            <Users className="size-4" /> Participants
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                            {analysis.participants?.map((p: string, i: number) => (
+                                <span key={i} className="px-2 py-1 bg-dark-3 text-zinc-400 text-[10px] rounded border border-white/10 uppercase font-semibold">
+                                    {p}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </section>
 
-             {/* Chat Interface Section */}
-             <section className="space-y-6 pt-12 mt-12 border-t border-white/5">
-                <div className="flex flex-col gap-2">
-                  <h3 className="text-sm font-bold text-blue-1 uppercase tracking-[0.2em] flex items-center gap-2 font-serif italic">
-                    <MessageSquare className="w-4 h-4" /> Chat with Intelligence
-                  </h3>
-                  <p className="text-[11px] text-zinc-500 leading-none">Ask any question based on the recording's full transcript</p>
+                  {analysis.risk_flags?.length > 0 && (
+                      <div className="flex flex-col gap-3">
+                        <h3 className="text-sm font-bold text-red-500/70 uppercase tracking-widest flex items-center gap-2">
+                            <AlertTriangle className="size-4" /> Risk Flags
+                        </h3>
+                        <div className="flex flex-col gap-2">
+                            {analysis.risk_flags.map((risk: string, i: number) => (
+                                <div key={i} className="text-xs text-red-400 bg-red-500/5 p-2 rounded border border-red-500/10">
+                                    {risk}
+                                </div>
+                            ))}
+                        </div>
+                      </div>
+                  )}
+
+                  {analysis.key_quotes?.length > 0 && (
+                      <div className="flex flex-col gap-3">
+                        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                            <Quote className="size-4" /> Key Quotes
+                        </h3>
+                        <div className="flex flex-col gap-3">
+                            {analysis.key_quotes.map((quote: string, i: number) => (
+                                <p key={i} className="text-sm text-zinc-400 italic font-medium leading-relaxed bg-white/5 p-4 rounded-xl border border-white/5">
+                                    "{quote}"
+                                </p>
+                            ))}
+                        </div>
+                      </div>
+                  )}
                 </div>
-
-                <div className="bg-dark-1/40 rounded-2xl border border-white/5 overflow-hidden flex flex-col min-h-[400px]">
-                  {/* Messages Area */}
-                  <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-[450px] custom-scrollbar">
+            ) : (
+                <div className="flex flex-col h-full gap-4">
+                  <div className="rounded-lg bg-blue-1/5 p-4 border border-blue-1/10 mb-2">
+                    <p className="text-xs text-blue-1/80 font-medium">
+                        Ask about specific topics, speaker statements, or details not covered in the summary.
+                    </p>
+                  </div>
+                  
+                  <div 
+                    ref={scrollRef}
+                    className="flex-1 flex flex-col gap-4 overflow-y-auto pb-4 custom-scrollbar"
+                  >
                     {messages.length === 0 && (
-                      <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                        <div className="bg-blue-1/10 p-4 rounded-full mb-4">
-                          <Bot className="w-8 h-8 text-blue-1/40" />
-                        </div>
-                        <p className="text-sm text-zinc-500 italic max-w-[200px]">
-                          How can I help you understand this meeting better?
-                        </p>
-                      </div>
+                         <div className="flex flex-col items-center justify-center h-full opacity-30 gap-4 mt-20">
+                            <MessageSquare className="size-12" />
+                            <p className="text-sm font-medium">No messages yet</p>
+                         </div>
                     )}
-                    {messages.map((msg: { role: string; content: string }, idx: number) => (
-                      <div key={idx} className={cn("flex gap-3 max-w-[85%]", msg.role === 'user' ? "ml-auto flex-row-reverse" : "")}>
-                        <div className={cn("flex-none w-8 h-8 rounded-full flex items-center justify-center", 
-                          msg.role === 'user' ? "bg-blue-1" : "bg-dark-3")}>
-                          {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 text-blue-1" />}
+                    {messages.map((msg, i) => (
+                        <div key={i} className={cn(
+                            "flex gap-3 max-w-[85%]",
+                            msg.role === 'user' ? "ml-auto flex-row-reverse" : "mr-auto"
+                        )}>
+                            <div className={cn(
+                                "p-2 rounded-lg size-10 flex-shrink-0 flex items-center justify-center",
+                                msg.role === 'user' ? "bg-blue-1" : "bg-dark-3 border border-white/5"
+                            )}>
+                                {msg.role === 'user' ? <User className="size-5" /> : <Bot className="size-5 text-blue-1" />}
+                            </div>
+                            <div className={cn(
+                                "p-4 rounded-2xl text-sm leading-relaxed",
+                                msg.role === 'user' ? "bg-blue-1 text-white rounded-tr-none" : "bg-dark-3 text-zinc-200 border border-white/5 rounded-tl-none"
+                            )}>
+                                {msg.content}
+                            </div>
                         </div>
-                        <div className={cn("p-3 rounded-2xl text-sm leading-relaxed", 
-                          msg.role === 'user' ? "bg-blue-1/10 text-white rounded-tr-none border border-blue-1/20" : "bg-dark-2 text-zinc-300 rounded-tl-none border border-white/5")}>
-                          {msg.content}
-                        </div>
-                      </div>
                     ))}
-                    {isSending && (
-                      <div className="flex gap-3">
-                        <div className="flex-none w-8 h-8 rounded-full bg-dark-3 flex items-center justify-center">
-                          <Bot className="w-4 h-4 text-blue-1" />
+                    {isTyping && (
+                        <div className="flex gap-3 mr-auto">
+                            <div className="bg-dark-3 border border-white/5 p-2 rounded-lg size-10 flex items-center justify-center">
+                                <Bot className="size-5 text-blue-1" />
+                            </div>
+                            <div className="bg-dark-3 border border-white/5 p-4 rounded-2xl rounded-tl-none flex gap-1">
+                                <div className="size-1.5 bg-blue-1/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                <div className="size-1.5 bg-blue-1/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                <div className="size-1.5 bg-blue-1/50 rounded-full animate-bounce" />
+                            </div>
                         </div>
-                        <div className="bg-dark-2 p-3 rounded-2xl rounded-tl-none border border-white/5">
-                          <Loader2 className="w-4 h-4 animate-spin text-blue-1" />
-                        </div>
-                      </div>
                     )}
                   </div>
 
-                  {/* Input Area */}
-                  <div className="p-4 bg-dark-2/50 border-t border-white/5">
-                    <div className="flex gap-2">
-                      <input 
-                        type="text" 
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                  <div className="pt-4 border-t border-white/5 mt-auto bg-dark-2 sticky bottom-0 flex gap-2">
+                    <Input 
+                        placeholder="Ask a question..."
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                        placeholder="Ask about the meeting..."
-                        className="flex-1 bg-dark-3 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-1/50 transition-all placeholder:text-zinc-600"
-                        disabled={isSending}
-                      />
-                      <button 
+                        className="bg-dark-3 border-none focus-visible:ring-1 focus-visible:ring-blue-1"
+                    />
+                    <Button 
+                        size="icon" 
                         onClick={handleSendMessage}
-                        disabled={isSending || !input.trim()}
-                        className="bg-blue-1 hover:bg-blue-1/90 disabled:opacity-50 disabled:hover:bg-blue-1 text-white p-2.5 rounded-xl transition-all shadow-lg"
-                      >
-                        <Send className="w-4 h-4" />
-                      </button>
-                    </div>
+                        disabled={isTyping || !chatInput.trim()}
+                        className="bg-blue-1 hover:bg-blue-600"
+                    >
+                        <Send className="size-4" />
+                    </Button>
                   </div>
                 </div>
-             </section>
-
-            {/* Topics Discussed */}
-            <section className="space-y-4 pt-10 border-t border-white/5 pb-10">
-              <h3 className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.3em] leading-none mb-4">Agenda & Topics</h3>
-              <div className="flex flex-wrap gap-2">
-                {analysis.topics_discussed?.map((topic: string, idx: number) => (
-                  <span key={idx} className="bg-white/5 text-zinc-500 text-[10px] px-2.5 py-1 rounded-md border border-white/5 font-medium transition-all hover:bg-white/10 hover:text-zinc-300 cursor-default">
-                    {topic}
-                  </span>
-                ))}
-              </div>
-            </section>
-          </div>
+            )}
         </div>
       </SheetContent>
     </Sheet>

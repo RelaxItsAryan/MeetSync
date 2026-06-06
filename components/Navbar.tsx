@@ -17,6 +17,7 @@ import {
 import { User, LogOut, Settings } from 'lucide-react';
 
 import MobileNav from './MobileNav';
+import { ZenSync } from './ZenSync';
 
 const Navbar = () => {
   const { user, isLoaded } = useFirebaseUser();
@@ -44,6 +45,7 @@ const Navbar = () => {
       </Link>
 
       <div className="flex-between gap-5">
+        <ZenSync />
         {!isLoaded ? (
           <div className="size-9 rounded-full bg-dark-3 animate-pulse" />
         ) : user ? (
