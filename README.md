@@ -5,6 +5,9 @@ MeetSync is not just a video calling platform—it's a sophisticated **Multi-Age
 ![MeetSync Banner](https://img.shields.io/badge/AI%20Agents-Llama%203.3%20%2B%20Whisper-orange?style=for-the-badge)
 ![Accountability Engine](https://img.shields.io/badge/Engine-Accountability%20Intelligence-blue?style=for-the-badge)
 ![Groq Powered](https://img.shields.io/badge/Powered%20By-Groq-green?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js%2014-black?style=for-the-badge&logo=next.js)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 ---
 
