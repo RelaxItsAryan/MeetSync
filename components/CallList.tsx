@@ -6,12 +6,38 @@ import { useGetCalls } from '@/hooks/useGetCalls';
 import MeetingCard from './MeetingCard';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { deleteMeetingFromFirestore } from '@/actions/meeting.actions';
+import { deleteRecordingFromFirestore } from '@/actions/recording.actions';
+import { useToast } from './ui/use-toast';
 
 const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
   const router = useRouter();
   const { endedCalls, upcomingCalls, callRecordings, firebaseRecordings, isLoading } =
     useGetCalls();
   const [streamRecordings, setStreamRecordings] = useState<CallRecording[]>([]);
+  const { toast } = useToast();
+
+  const handleDelete = async (id: string, meetingType: 'ended' | 'recordings' | 'upcoming') => {
+    try {
+      console.log(`CallList handleDelete calling for ${id} type ${meetingType}`);
+      let result;
+      if (meetingType === 'recordings') {
+        result = await deleteRecordingFromFirestore(id);
+      } else {
+        result = await deleteMeetingFromFirestore(id);
+      }
+
+      if (result.success) {
+        toast({ title: 'Deleted successfully' });
+        window.location.reload();
+      } else {
+        toast({ title: result.error || 'Failed to delete', variant: 'destructive' });
+      }
+    } catch (error: any) {
+      console.error("Delete handler error:", error);
+      toast({ title: error.message || 'An error occurred', variant: 'destructive' });
+    }
+  };
 
   const getCalls = () => {
     switch (type) {
@@ -71,10 +97,13 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
       {calls && calls.length > 0 ? (
-        calls.map((meeting: any) => {
+        calls.map((meeting: any, index: number) => {
           // Determine data source and format props for MeetingCard
+          // For Stream recordings, we use the filename or a part of the URL as ID since they don't have a direct .id
+          const recordingId = meeting.id || meeting.streamId || (type === 'recordings' ? (meeting.filename || meeting.url?.split('/').pop()?.split('?')[0]) : '');
+          
           const cardProps = {
-            id: meeting.id || meeting.streamId,
+            id: recordingId,
             icon: '',
             title: '',
             date: '',
@@ -88,7 +117,7 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
             cardProps.icon = '/icons/recordings.svg';
             cardProps.buttonIcon1 = '/icons/play.svg';
             cardProps.buttonText = 'Play';
-            
+
             // if it's a Firebase recording
             if (meeting.videoUrl) {
               cardProps.title = meeting.title;
@@ -120,7 +149,9 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
 
           return (
             <MeetingCard
-              key={cardProps.id}
+              key={cardProps.id || index}
+              id={cardProps.id}
+              type={type}
               icon={cardProps.icon}
               title={cardProps.title}
               date={cardProps.date}
@@ -128,11 +159,16 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
               link={cardProps.link}
               buttonIcon1={cardProps.buttonIcon1}
               buttonText={cardProps.buttonText}
+              onDelete={meeting.id || meeting.creatorId || meeting.uploadedBy ? () => {
+                const deleteId = meeting.id;
+                console.log("Attempting to delete with ID:", deleteId);
+                handleDelete(deleteId, type);
+              } : undefined}
               handleClick={() => {
                 if (type === 'recordings') {
-                   window.open(cardProps.link, '_blank');
+                  window.open(cardProps.link, '_blank');
                 } else {
-                   router.push(`/meeting/${meeting.id || meeting.streamId}`);
+                  router.push(`/meeting/${meeting.id || meeting.streamId}`);
                 }
               }}
             />

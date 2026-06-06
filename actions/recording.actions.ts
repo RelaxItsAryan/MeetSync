@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from "@/lib/firebase";
-import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp, deleteDoc, doc } from "firebase/firestore";
 import { cookies } from "next/headers";
 
 const getUserIdFromCookie = (): string => {
@@ -60,5 +60,19 @@ export const getRecordingsFromFirestore = async () => {
   } catch (error) {
     console.error("Error fetching recordings:", error);
     return [];
+  }
+};
+export const deleteRecordingFromFirestore = async (id: string) => {
+  if (!id) return { success: false, error: "No recording ID provided" };
+  try {
+    const userId = getUserIdFromCookie();
+    console.log(`[AUTH] User ${userId} is deleting recording ${id}`);
+    
+    await deleteDoc(doc(db, "recordings", id));
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("FIREBASE DELETE ERROR (Recording):", error);
+    return { success: false, error: error.message || "Failed to delete recording" };
   }
 };
