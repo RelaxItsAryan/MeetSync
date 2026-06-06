@@ -191,3 +191,9 @@ The system works because it respects a fundamental truth: meetings are about com
 ---
 
 **MeetSync uses [Hindsight](https://hindsight.vectorize.io/) to power agent memory for meeting context retrieval. Learn more about [agent memory systems](https://vectorize.io/what-is-agent-memory) on Vectorize.**
+
+---
+## Screenshots
+<img width="1600" height="868" alt="WhatsApp Image 2026-06-06 at 21 33 44" src="https://github.com/user-attachments/assets/0ce206c5-d0b0-4a39-a9cb-2b427174560f" />
+<img width="1600" height="1000" alt="WhatsApp Image 2026-06-06 at 21 37 35" src="https://github.com/user-attachments/assets/3e2a6b4b-56c1-45a9-b947-03f6f288b704" />
+<img width="1886" height="920" alt="Screenshot 2026-06-06 213803" src="https://github.com/user-attachments/assets/57bbda1a-6ef7-4b3b-ad79-40dfa9aecac1" />
