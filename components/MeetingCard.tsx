@@ -78,6 +78,12 @@ const MeetingCard = ({
         }),
       });
 
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("API Error Response:", text);
+        throw new Error(`Server returned ${response.status}: ${text.slice(0, 100)}...`);
+      }
+
       const data = await response.json();
       if (data.success) {
         setAnalysis(data.analysis);
@@ -86,6 +92,7 @@ const MeetingCard = ({
       } else {
         throw new Error(data.error);
       }
+
     } catch (error: any) {
       toast({
         title: "Analysis Failed",
