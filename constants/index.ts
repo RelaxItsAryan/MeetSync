@@ -31,11 +31,6 @@ export const sidebarLinks = [
     label: 'Profile',
   },
   {
-    imgURL: '/icons/brain.svg',
-    route: '/intelligence',
-    label: 'Intelligence',
-  },
-  {
     imgURL: '/icons/recordings.svg',
     route: '/atmosphere',
     label: 'Atmosphere',
