@@ -2,9 +2,12 @@
 
 MeetSync is a video conferencing platform reimagined for individual focus and sensory comfort. Moving away from standard corporate tools, MeetSync prioritizes the **human experience** of digital collaboration through curated environments and tactile documentation.
 
-![MeetSync Banner](https://img.shields.io/badge/Focus-Atmospheric%20Conferencing-orange?style=for-the-badge)
-![Zen Sync](https://img.shields.io/badge/Feature-Zen%20Sync-blue?style=for-the-badge)
-![Parchment Theme](https://img.shields.io/badge/Aesthetic-Parchment%20Modern-green?style=for-the-badge)
+![MeetSync Banner](https://img.shields.io/badge/AI%20Agents-Llama%203.3%20%2B%20Whisper-orange?style=for-the-badge)
+![Accountability Engine](https://img.shields.io/badge/Engine-Accountability%20Intelligence-blue?style=for-the-badge)
+![Groq Powered](https://img.shields.io/badge/Powered%20By-Groq-green?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js%2014-black?style=for-the-badge&logo=next.js)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 ---
 
