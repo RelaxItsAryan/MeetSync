@@ -96,10 +96,6 @@ const RecordingUploadModal = ({ onSuccess }: { onSuccess: () => void }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-1 hover:bg-blue-600 gap-2">
-          <Upload className="size-4" />
-          Upload Recording
-        </Button>
       </DialogTrigger>
       <DialogContent className="bg-dark-1 border-dark-3 text-white sm:max-w-[425px]">
         <DialogHeader>
@@ -132,8 +128,8 @@ const RecordingUploadModal = ({ onSuccess }: { onSuccess: () => void }) => {
                 <span>{progress}%</span>
               </div>
               <div className="h-2 w-full bg-dark-3 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-blue-1 transition-all duration-300" 
+                <div
+                  className="h-full bg-blue-1 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>

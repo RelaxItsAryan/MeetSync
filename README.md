@@ -2,22 +2,13 @@
 
 MeetSync is a video conferencing platform reimagined for individual focus and autonomous intelligence. It bridges the gap between **sensory-rich digital environments** and **high-speed AI accountability**, ensuring that every meeting is not just experienced, but remembered and acted upon.
 
-![MeetSync Banner](https://img.shields.io/badge/AI%20Intelligence-Groq%20Llama%203.3-orange?style=for-the-badge)
-![Transcription](https://img.shields.io/badge/Transcription-Whisper%20Large%20v3-green?style=for-the-badge)
+![MeetSync Banner](https://img.shields.io/badge/AI%20Agents-Llama%203.3%20%2B%20Whisper-orange?style=for-the-badge)
 ![Hindsight](https://img.shields.io/badge/Memory-Hindsight%20Sync-blue?style=for-the-badge)
+![Accountability Engine](https://img.shields.io/badge/Engine-Accountability%20Intelligence-blue?style=for-the-badge)
+![Groq Powered](https://img.shields.io/badge/Powered%20By-Groq-green?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-black?style=for-the-badge&logo=next.js)
-
----
-
-## 🧠 Hindsight: The AI Accountability Engine
-
-MeetSync doesn't just record meetings; it understands them. Powered by **Groq's Llama 3.3 (70B)** and **Whisper-Large-v3**, the Hindsight system provides a persistent intelligence layer for your collaboration.
-
-*   **⚡ Groq-Speed Analysis**: Instant transcription and intelligence extraction using Whisper-large-v3 and Llama-3.3-70b-versatile.
-*   **🤝 Commitment Tracking**: Automatically detects promises made during calls, including owners and deadlines, syncing them to your long-term memory.
-*   **📊 Multi-Dimensional Insights**: Generates factual summaries, sentiment analysis, emotional cues, and risk flags for every session.
-*   **💬 Contextual Q&A**: An interactive chat interface that lets you query past meetings—ask "What did we decide on the budget?" and get instant answers from the transcript.
-*   **📁 Intelligent Memory**: All transcripts and analyses are indexed and stored in Firestore, creating a searchable archive of human interactions.
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 ---
 
@@ -67,7 +58,6 @@ Create a `.env` file with the following:
 NEXT_PUBLIC_FIREBASE_API_KEY=...
 NEXT_PUBLIC_STREAM_API_KEY=...
 STREAM_SECRET_KEY=...
-GROQ_API_KEY=...
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 

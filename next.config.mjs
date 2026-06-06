@@ -22,6 +22,12 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/analyze-recording': ['node_modules/ffmpeg-static/ffmpeg'],
+    },
+  },
 };
+
 
 export default nextConfig;
