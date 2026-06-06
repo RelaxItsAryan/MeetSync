@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-const execPromise = promisify(exec);
+export const maxDuration = 300; // Allow up to 5 min for long recordings (Vercel Pro/Hobby limit)
 
 export async function POST(req: Request) {
   const tempFiles: string[] = [];
@@ -24,33 +22,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Groq API Key not configured' }, { status: 500 });
     }
 
-    // 1. Create temp directory
-    const tempDir = os.tmpdir();
-    const videoPath = path.join(tempDir, `video_${recording_id}.mp4`);
-    const audioPath = path.join(tempDir, `audio_${recording_id}.mp3`);
-    tempFiles.push(videoPath, audioPath);
-
-    // 2. Download video
+    // 1. Download video directly into memory as a buffer
+    // (No ffmpeg needed — Groq Whisper accepts .mp4 files natively)
     console.log('Downloading video...');
     const videoResponse = await fetch(video_url);
-    if (!videoResponse.ok) throw new Error('Failed to download video');
-    const arrayBuffer = await videoResponse.arrayBuffer();
-    fs.writeFileSync(videoPath, new Uint8Array(arrayBuffer));
+    if (!videoResponse.ok) throw new Error(`Failed to download video: ${videoResponse.statusText}`);
+    const videoBuffer = await videoResponse.arrayBuffer();
 
-    // 3. Extract audio using ffmpeg
-    console.log('Extracting audio...');
-    try {
-      await execPromise(`ffmpeg -i "${videoPath}" -vn -ar 16000 -ac 1 -ab 32k -f mp3 "${audioPath}" -y`);
-    } catch (ffmpegErr) {
-      console.error('FFmpeg Error:', ffmpegErr);
-      throw new Error('Failed to process video audio');
-    }
+    // 2. Write to temp file so we can send as a multipart upload
+    const tempDir = os.tmpdir();
+    const videoPath = path.join(tempDir, `video_${recording_id}.mp4`);
+    tempFiles.push(videoPath);
+    fs.writeFileSync(videoPath, new Uint8Array(videoBuffer));
 
-    // 4. Send to Groq Whisper for transcription
+    // 3. Send the .mp4 directly to Groq Whisper for transcription (no ffmpeg needed)
     console.log('Transcribing with Groq Whisper...');
     const formData = new FormData();
-    const audioBuffer = fs.readFileSync(audioPath);
-    formData.append('file', new Blob([new Uint8Array(audioBuffer)]), 'audio.mp3');
+    formData.append('file', new Blob([new Uint8Array(videoBuffer)], { type: 'video/mp4' }), 'recording.mp4');
     formData.append('model', 'whisper-large-v3');
     formData.append('response_format', 'verbose_json');
 
@@ -72,7 +60,7 @@ export async function POST(req: Request) {
 
     if (!transcript) throw new Error('Failed to receive transcript from Groq');
 
-    // 5. Build Analysis Prompt for Llama-3
+    // 4. Build Analysis Prompt for Llama-3
     const prompt = `You are a meeting intelligence analyst. Analyze this meeting transcript carefully.
 Return ONLY a valid JSON object with no markdown, no explanation, no preamble.
 
@@ -97,7 +85,7 @@ Return ONLY a valid JSON object with no markdown, no explanation, no preamble.
 Transcript:
 ${transcript}`;
 
-    // 6. Call Groq Llama-3 for analysis
+    // 5. Call Groq Llama-3 for analysis
     console.log('Analyzing with Groq Llama-3...');
     const llamaResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -124,7 +112,7 @@ ${transcript}`;
     const llamaData = await llamaResponse.json();
     const analysis = JSON.parse(llamaData.choices[0].message.content);
 
-    // 7. Save to Firestore
+    // 6. Save to Firestore
     await setDoc(doc(db, 'meeting_analyses', recording_id), {
       analysis,
       transcript,
