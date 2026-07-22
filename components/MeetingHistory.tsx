@@ -27,6 +27,8 @@ const MeetingHistory = () => {
         meetings.map((meeting) => (
           <MeetingCard
             key={meeting.id}
+            id={meeting.id}
+            type="ended"
             icon="/icons/previous.svg"
             title={meeting.description || 'No Description'}
             date={meeting.startsAt ? new Date(meeting.startsAt).toLocaleString() : 'N/A'}
@@ -35,7 +37,6 @@ const MeetingHistory = () => {
             buttonIcon1={undefined}
             buttonText="Start"
             handleClick={() => { window.location.href = `/meeting/${meeting.streamId}`; }}
-
           />
         ))
       ) : (
