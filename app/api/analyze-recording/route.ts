@@ -10,6 +10,60 @@ export const maxDuration = 300;
 
 import { execSync } from 'child_process';
 
+const getFFmpegPath = () => {
+    try {
+        const ffmpeg = require('ffmpeg-static');
+        let fPath = typeof ffmpeg === 'string' ? ffmpeg : ffmpeg.path;
+        
+        // --- 1. CLEAN THE PATH ---
+        // Strip out Next.js rsc/ssr prefixes if they exist (common in Dev mode)
+        if (fPath && fPath.includes('(')) {
+            fPath = fPath.replace(/^\([^)]+\)/, '').replace(/^\\/, '').replace(/^\//, '');
+        }
+
+        // --- 2. VERIFY OR RESOLVE ---
+        if (!fPath || !fs.existsSync(fPath)) {
+            const binName = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+            // Try absolute project root detection (most reliable on Localhost)
+            const absolutePath = path.join(process.cwd(), 'node_modules', 'ffmpeg-static', binName);
+            
+            if (fs.existsSync(absolutePath)) {
+                fPath = absolutePath;
+            } else {
+                // Last ditch effort: try require.resolve
+                try {
+                   const pkgPath = require.resolve('ffmpeg-static');
+                   fPath = path.join(path.dirname(pkgPath), binName).replace(/^\([^)]+\)/, '');
+                } catch (e) {
+                    console.error("FFmpeg final resolution failed:", e);
+                }
+            }
+        }
+
+        if (fPath && fs.existsSync(fPath)) {
+            // Ensure execution permissions on Linux/Vercel
+            if (process.platform !== 'win32') {
+                try {
+                    fs.chmodSync(fPath, 0o755);
+                } catch (e) {}
+            }
+            return fPath;
+        }
+        
+        return fPath;
+    } catch (e) {
+        console.error("FFmpeg Path helper crash:", e);
+        return null;
+    }
+};
+
+
+
+
+
+
+
+
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 const getUserIdFromAuthHeader = (req: Request): string => {
@@ -59,13 +113,24 @@ export async function POST(req: Request) {
     fs.writeFileSync(videoPath, new Uint8Array(videoBuffer));
 
     // 2. Extract Audio with FFmpeg
-    console.log('Extracting audio with FFmpeg...');
-    try {
-      execSync(`ffmpeg -i "${videoPath}" -vn -ar 16000 -ac 1 -ab 64k -f mp3 "${audioPath}" -y`);
-    } catch (ffmpegErr) {
-      console.error('FFmpeg Error:', ffmpegErr);
-      throw new Error('Failed to process video audio. Ensure FFmpeg is installed.');
+    const ffmpegPath = getFFmpegPath();
+    if (!ffmpegPath) {
+        throw new Error('FFmpeg binary could not be located in this environment.');
     }
+
+    console.log('Extracting audio with FFmpeg using path:', ffmpegPath);
+    try {
+      // Use the absolute path provided by the installer
+      execSync(`"${ffmpegPath}" -i "${videoPath}" -vn -ar 16000 -ac 1 -ab 64k -f mp3 "${audioPath}" -y`, {
+        stdio: 'pipe' // Capture output for debugging
+      });
+    } catch (ffmpegErr: any) {
+      const errorDetail = ffmpegErr.stderr?.toString() || ffmpegErr.message;
+      console.error('FFmpeg Execution Error:', errorDetail);
+      throw new Error(`FFmpeg Analysis Failed: ${errorDetail}. Path used: ${ffmpegPath}`);
+    }
+
+
 
     const audioBuffer = fs.readFileSync(audioPath);
 
