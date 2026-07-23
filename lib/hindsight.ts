@@ -4,7 +4,6 @@ const apiKey = process.env.HINDSIGHT_API_KEY || "";
 const pipelineId = process.env.HINDSIGHT_PIPELINE_ID || "";
 
 const client = new HindsightClient({
-  baseUrl: process.env.HINDSIGHT_BASE_URL || "https://api.vectorize.io/hindsight",
   apiKey,
 });
 
@@ -30,21 +29,26 @@ Emotional cues: ${(analysis.emotional_cues || []).join(", ") || "None"}.
 Key quotes: ${(analysis.key_quotes || []).join(", ") || "None"}.`;
 
     // 2. Metadata for Hindsight
-    const metadata: Record<string, string> = {
-      userId: String(userId || ""),
-      meetingId: String(meetingId || ""),
-      meetingDate: String(meetingDate || ""),
-      sentiment: String(analysis.sentiment || "Neutral"),
-      dealStage: String(analysis.deal_stage || "not_applicable"),
-      hasPromises: String((analysis.promises_made || []).length > 0),
-      hasRisks: String((analysis.risk_flags || []).length > 0),
+    const metadata = {
+      userId,
+      meetingId,
+      meetingDate,
+      sentiment: analysis.sentiment,
+      dealStage: analysis.deal_stage,
+      hasPromises: (analysis.promises_made || []).length > 0,
+      hasRisks: (analysis.risk_flags || []).length > 0,
     };
 
     // 3. Ingest into Hindsight
     console.log(`[HINDSIGHT] Retaining memory for meeting: ${meetingId}`);
-    await client.retain(pipelineId, content, {
-      documentId: meetingId,
-      metadata,
+    await client.ingest({
+      pipelineId,
+      documents: [
+        {
+          content,
+          metadata,
+        },
+      ],
     });
 
     console.log(`[HINDSIGHT] Successfully retained memory for meeting: ${meetingId}`);
@@ -58,7 +62,11 @@ export const recallMeetingMemory = async (query: string, userId: string) => {
     console.log(`[HINDSIGHT] Recalling memory for user ${userId}: ${query}`);
     
     // Prefixing query as requested: "[userId]: [query]"
-    const response = await client.recall(pipelineId, `[${userId}]: ${query}`);
+    const response = await client.query({
+        pipelineId,
+        query: `[${userId}]: ${query}`,
+        limit: 5,
+    });
 
     return response.results || [];
   } catch (error) {
