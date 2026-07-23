@@ -79,6 +79,9 @@ export const AnalysisPanel = ({
           recording_id: recordingId,
           message: userMessage,
           history: messages,
+          transcript: analysis.transcript,
+          analysis: analysis,
+          meeting_title: title,
         }),
       });
 

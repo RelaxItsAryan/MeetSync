@@ -17,15 +17,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Groq API Key not configured' }, { status: 500 });
     }
 
-    // 1. Fetch transcript from Firestore
-    const docRef = doc(db, "meeting_analyses", recording_id);
-    const docSnap = await getDoc(docRef);
-    
-    if (!docSnap.exists()) {
-      return NextResponse.json({ error: 'No analysis found for this recording. Please analyze it first.' }, { status: 404 });
-    }
+    // 1. Fetch transcript from Firestore or request body (bypasses server-side read permission issues)
+    let transcript = body.transcript;
+    let analysis = body.analysis;
+    let meeting_title = body.meeting_title;
 
-    const { transcript, analysis, meeting_title } = docSnap.data();
+    if (!transcript || !analysis) {
+      console.log(`[CHAT] Fetching transcript from Firestore fallback for recording ${recording_id}...`);
+      const docRef = doc(db, "meeting_analyses", recording_id);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        return NextResponse.json({ error: 'No analysis found for this recording. Please analyze it first.' }, { status: 404 });
+      }
+
+      const docData = docSnap.data();
+      transcript = docData.transcript;
+      analysis = docData.analysis;
+      meeting_title = docData.meeting_title || meeting_title;
+    }
 
     // 2. Chat with Groq Llama-3.3
     console.log(`[CHAT] Asking about recording ${recording_id}: ${message}`);

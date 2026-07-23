@@ -104,6 +104,8 @@ const CalendarPage = () => {
               filteredMeetings.map((meeting: Call) => (
                 <MeetingCard
                   key={meeting.id}
+                  id={meeting.id}
+                  type="upcoming"
                   icon="/icons/upcoming.svg"
                   title={meeting.state?.custom?.description || 'No Description'}
                   date={new Date(meeting.state.startsAt!).toLocaleString()}
@@ -111,7 +113,6 @@ const CalendarPage = () => {
                   link={`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.id}`}
                   buttonText="Start"
                   handleClick={() => { window.open(`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.id}`); }}
-
                 />
               ))
             ) : (

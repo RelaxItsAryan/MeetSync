@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { retainMeetingMemory } from '@/lib/hindsight';
+
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -203,25 +201,10 @@ ${transcript}`;
     const llamaData = await llamaResponse.json();
     const analysis = JSON.parse(llamaData.choices[0].message.content);
 
-    // 4. Save to Firestore
-    console.log('Saving analysis to Firestore...');
-    await setDoc(doc(db, 'meeting_analyses', recording_id), {
-      analysis,
-      transcript,
-      video_url,
-      meeting_title,
-      userId,
-      analyzed_at: serverTimestamp(),
-    });
+    // 4. Save to Firestore (Disabled on server to avoid unauthenticated PERMISSION_DENIED; now handled by client)
+    console.log('Skipping server-side Firestore save; client will save the analysis.');
 
-    // 5. Hindsight Retention (Fire-and-forget)
-    retainMeetingMemory({
-        userId,
-        meetingId: recording_id,
-        meetingTitle: meeting_title,
-        meetingDate: meeting_date || new Date().toISOString(),
-        analysis
-    }).catch(err => console.error("Hindsight retain failed:", err));
+
 
     return NextResponse.json({ success: true, analysis, transcript });
 

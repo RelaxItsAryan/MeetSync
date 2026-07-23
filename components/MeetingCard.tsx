@@ -7,7 +7,7 @@ import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { useFirebaseUser } from "@/providers/FirebaseAuthProvider";
 import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { Sparkles, Loader2 } from "lucide-react";
 import { AnalysisPanel } from "./AnalysisPanel";
 
@@ -45,17 +45,25 @@ const MeetingCard = ({
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   useEffect(() => {
-    if (isPreviousMeeting && id) {
+    if (isPreviousMeeting && id && user) {
       const fetchAnalysis = async () => {
-        const docRef = doc(db, "meeting_analyses", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setAnalysis(docSnap.data().analysis);
+        try {
+          const docRef = doc(db, "meeting_analyses", id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setAnalysis({
+              ...data.analysis,
+              transcript: data.transcript
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching analysis:", err);
         }
       };
       fetchAnalysis();
     }
-  }, [id, isPreviousMeeting]);
+  }, [id, isPreviousMeeting, user]);
 
   const handleAnalyze = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -86,7 +94,24 @@ const MeetingCard = ({
 
       const data = await response.json();
       if (data.success) {
-        setAnalysis(data.analysis);
+        // Save to Firestore from the client where user is authenticated
+        try {
+          await setDoc(doc(db, "meeting_analyses", id), {
+            analysis: data.analysis,
+            transcript: data.transcript,
+            video_url: link,
+            meeting_title: title,
+            userId: user?.uid,
+            analyzed_at: serverTimestamp(),
+          });
+        } catch (firestoreErr) {
+          console.error("Client-side Firestore save failed:", firestoreErr);
+        }
+
+        setAnalysis({
+          ...data.analysis,
+          transcript: data.transcript
+        });
         setIsAnalysisOpen(true);
         toast({ title: "Analysis Complete", description: "Meeting memory synced to Hindsight." });
       } else {
