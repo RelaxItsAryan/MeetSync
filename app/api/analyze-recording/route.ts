@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+export const dynamic = 'force-dynamic';
 export const maxDuration = 300; 
 
 import { execSync } from 'child_process';

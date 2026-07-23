@@ -24,7 +24,7 @@ export const FirebaseAuthProvider = ({ children }: { children: ReactNode }) => {
       if (firebaseUser) {
         // Set/Refresh the auth cookie
         const token = await firebaseUser.getIdToken();
-        document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
+        document.cookie = `firebase-auth-token=${token}; path=/; max-age=2592000; SameSite=Lax`;
       } else {
         // Clear cookie on sign out
         document.cookie = 'firebase-auth-token=; path=/; max-age=0';
@@ -41,7 +41,7 @@ export const FirebaseAuthProvider = ({ children }: { children: ReactNode }) => {
     const refreshInterval = setInterval(async () => {
       if (auth.currentUser) {
         const token = await auth.currentUser.getIdToken(true);
-        document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
+        document.cookie = `firebase-auth-token=${token}; path=/; max-age=2592000; SameSite=Lax`;
       }
     }, 40 * 60 * 1000);
 

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+
+// Force dynamic rendering - prevents build-time static data collection
+// which would fail because Firebase client SDK requires a browser environment
+export const dynamic = 'force-dynamic';
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
@@ -17,13 +19,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Groq API Key not configured' }, { status: 500 });
     }
 
-    // 1. Fetch transcript from Firestore or request body (bypasses server-side read permission issues)
+    // 1. Fetch transcript from request body or Firestore
     let transcript = body.transcript;
     let analysis = body.analysis;
     let meeting_title = body.meeting_title;
 
     if (!transcript || !analysis) {
       console.log(`[CHAT] Fetching transcript from Firestore fallback for recording ${recording_id}...`);
+      // Lazy import firebase to avoid build-time initialization
+      const { db } = await import('@/lib/firebase');
+      const { doc, getDoc } = await import('firebase/firestore');
+      
       const docRef = doc(db, "meeting_analyses", recording_id);
       const docSnap = await getDoc(docRef);
       

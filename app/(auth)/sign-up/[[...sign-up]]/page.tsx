@@ -25,7 +25,7 @@ export default function SignUpPage() {
 
   const setAuthCookie = async (user: import('firebase/auth').User) => {
     const token = await user.getIdToken();
-    document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
+    document.cookie = `firebase-auth-token=${token}; path=/; max-age=2592000; SameSite=Lax`;
   };
 
   const handleEmailSignUp = async (e: FormEvent) => {

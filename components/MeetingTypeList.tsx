@@ -5,6 +5,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
+import { generateClassCode } from '@/lib/utils';
 
 import HomeCard from './HomeCard';
 import MeetingModal from './MeetingModal';
@@ -15,6 +16,9 @@ import { Textarea } from './ui/textarea';
 import { useToast } from './ui/use-toast';
 import { Input } from './ui/input';
 import { saveMeetingToFirestore } from '@/actions/meeting.actions';
+import { School } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const ReactDatePicker = dynamic(() => import('react-datepicker'), {
   ssr: false,
@@ -30,8 +34,11 @@ const initialValues = {
 const MeetingTypeList = () => {
   const router = useRouter();
   const [meetingState, setMeetingState] = useState<
-    'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined
+    'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | 'isCreateClassroom' | 'isJoinClassroom' | undefined
   >(undefined);
+  const [classroomCode, setClassroomCode] = useState('');
+  const [classroomName, setClassroomName] = useState('');
+  const [isCreatingClassroom, setIsCreatingClassroom] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [callDetail, setCallDetail] = useState<Call>();
   const client = useStreamVideoClient();
@@ -97,6 +104,41 @@ const MeetingTypeList = () => {
     }
   };
 
+  const createClassroom = async () => {
+    if (!user) {
+      toast({ title: 'Please sign in to create a classroom' });
+      return;
+    }
+    setIsCreatingClassroom(true);
+    try {
+      const id = generateClassCode();
+      const name = classroomName.trim() || `Classroom ${id}`;
+      
+      // Perform database write from the client (where auth state is attached)
+      await setDoc(doc(db, "classrooms", id), {
+        code: id,
+        name,
+        hostId: user.uid,
+        hostName: user.displayName || user.email?.split('@')[0] || 'Anonymous',
+        createdAt: serverTimestamp(),
+      });
+
+      setMeetingState(undefined);
+      setClassroomName('');
+      router.push(`/classroom/${id}`);
+      toast({ title: '🏫 Smart Classroom Created!', description: `Code: ${id}` });
+    } catch (error: any) {
+      console.error('Classroom creation error:', error);
+      toast({
+        title: 'Failed to create Classroom',
+        description: error.message || 'Please check your connection and try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCreatingClassroom(false);
+    }
+  };
+
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
   const meetingLink = `${baseUrl}/meeting/${callDetail?.id}`;
 
@@ -139,6 +181,26 @@ const MeetingTypeList = () => {
         description="Meeting Recordings"
         className="bg-yellow-1"
         handleClick={() => router.push('/recordings')}
+      />
+      <HomeCard
+        img="/icons/add-meeting.svg"
+        title="Smart Classroom"
+        description="Create a private class"
+        className="bg-green-600"
+        handleClick={() => {
+          if (!user) return toast({ title: 'Please sign in first' });
+          setMeetingState('isCreateClassroom');
+        }}
+      />
+      <HomeCard
+        img="/icons/join-meeting.svg"
+        title="Join Classroom"
+        description="Enter class code"
+        className="bg-orange-500"
+        handleClick={() => {
+          setClassroomCode('');
+          setMeetingState('isJoinClassroom');
+        }}
       />
 
       {!isClientReady && (
@@ -232,6 +294,60 @@ const MeetingTypeList = () => {
         buttonText="Start Meeting"
         handleClick={createMeeting}
       />
+
+      <MeetingModal
+        isOpen={meetingState === 'isCreateClassroom'}
+        onClose={() => { setMeetingState(undefined); setClassroomName(''); }}
+        title="Create Smart Classroom"
+        className="text-center"
+        buttonText={isCreatingClassroom ? 'Creating...' : 'Create Classroom'}
+        handleClick={createClassroom}
+      >
+        <div className="flex flex-col gap-3">
+          <label className="text-sm font-medium text-sky-2 text-left">Classroom Name (optional)</label>
+          <Input
+            placeholder="e.g. Math 101, CS Study Group..."
+            value={classroomName}
+            onChange={(e) => setClassroomName(e.target.value)}
+            className="border-none bg-dark-3 focus-visible:ring-0 focus-visible:ring-offset-0"
+            maxLength={50}
+          />
+          <p className="text-xs text-gray-500">
+            A short, readable class code will be auto-generated. Share it with your students to join.
+          </p>
+        </div>
+      </MeetingModal>
+
+      <MeetingModal
+        isOpen={meetingState === 'isJoinClassroom'}
+        onClose={() => setMeetingState(undefined)}
+        title="Join Smart Classroom"
+        className="text-center"
+        buttonText="Join Classroom"
+        handleClick={() => {
+          const code = classroomCode.trim().toUpperCase();
+          if (!code) {
+            toast({ title: 'Please enter a classroom code' });
+            return;
+          }
+          setMeetingState(undefined);
+          router.push(`/classroom/${code}`);
+        }}
+      >
+        <div className="flex flex-col gap-3">
+          <label className="text-sm font-medium text-sky-2 text-left">Enter Class Code</label>
+          <Input
+            placeholder="e.g. ABC-123"
+            value={classroomCode}
+            onChange={(e) => setClassroomCode(e.target.value.toUpperCase())}
+            className="border-none bg-dark-3 focus-visible:ring-0 focus-visible:ring-offset-0 text-center font-mono text-2xl tracking-[0.3em] font-bold"
+            maxLength={7}
+          />
+          <p className="text-xs text-gray-500">
+            Ask your group leader for the 6-character code.
+          </p>
+        </div>
+      </MeetingModal>
     </section>
   );
 };

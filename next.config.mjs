@@ -27,7 +27,21 @@ const nextConfig = {
       '/api/analyze-recording': ['node_modules/ffmpeg-static/ffmpeg'],
     },
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        net: false,
+        tls: false,
+        fs: false,
+      };
+    }
+    // Suppress the protobufjs critical dependency warning
+    config.ignoreWarnings = [
+      { module: /node_modules\/@protobufjs\/inquire/ },
+    ];
+    return config;
+  },
 };
-
 
 export default nextConfig;

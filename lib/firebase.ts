@@ -22,7 +22,7 @@ const auth = getAuth(app);
 const storage = getStorage(app);
 
 // Analytics is only for client-side
-let analytics;
+let analytics: any;
 if (typeof window !== "undefined") {
   isSupported().then((supported) => {
     if (supported) analytics = getAnalytics(app);
